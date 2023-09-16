@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>数据分析</title>
+    <script src="/static/js/jquery-3.3.1.min.js"></script>
+</head>
+
+<body>
+<h1>数据分析</h1>
+
+    <select id="param1" name="result">
+        <option>result</option>
+        <option>参数2</option>
+    </select>
+
+    <select id="param2" name="force">
+        <option>speed</option>
+        <option>形式2</option>
+    </select>
+    <br>
+
+    <button onclick="submit()">提交</button>
+
+</body>
+<script>
+
+    var field1 = document.getElementById("param1");
+    var field2 = document.getElementById("param2");
+    function submit() {
+//发送post请求，地址为index（Jquery）
+        $.ajax({
+            type: 'post',
+            url: 'http://127.0.0.1:8000/data/get_fields/',
+            data: JSON.stringify({"field1": field1,"field2":field2}),
+            datatype: 'json',
+            contentType: 'application/json',
+            success: function (result) {
+                if (result['code'] === 200) {
+                    alert(result['mes'])
+                } else {
+                    alert(result['error'])
+
+                }
+            }
+        })
+
+    }
+</script>
+
+
+</html>
