@@ -9,35 +9,57 @@
 <body>
 <h1>数据分析</h1>
 
-    <select id="param1" name="result">
-        <option>result</option>
-        <option>参数2</option>
-    </select>
+<select id="param1" name="result">
+    <option>result</option>
+    <option>参数2</option>
+</select>
 
-    <select id="param2" name="force">
-        <option>speed</option>
-        <option>形式2</option>
-    </select>
-    <br>
+<select id="param2" name="force">
+    <option>speed</option>
+    <option>形式2</option>
+</select>
+<br>
 
-    <button onclick="submit()">提交</button>
+<button onclick="submit()">提交</button>
 
 </body>
 <script>
+    {#    1:var options=$(“#select option:selected”); //获取选中的项#}
+    {##}
+    {#2:alert(options.val()); //拿到选中项的值#}
+    {##}
+    {#3:alert(options.text()); //拿到选中项的文本#}
+    {##}
+    {#4:alert(options.attr('url')); //拿到选中项的url值#}
 
-    var field1 = document.getElementById("param1");
-    var field2 = document.getElementById("param2");
+
+    var field1 = ($("#param1 option:selected")).val(); //获取选中的项
+    var field2 = ($("#param2 option:selected")).val();
+
     function submit() {
 //发送post请求，地址为index（Jquery）
         $.ajax({
             type: 'post',
             url: 'http://127.0.0.1:8000/data/get_fields/',
-            data: JSON.stringify({"field1": field1,"field2":field2}),
+            data: JSON.stringify({"field1": field1, "field2": field2}),
             datatype: 'json',
             contentType: 'application/json',
             success: function (result) {
                 if (result['code'] === 200) {
-                    alert(result['mes'])
+
+                    const info = result['mes'];
+
+                    for (let Key in info) {
+                        //遍历对象属性
+                        console.log(Key);
+                        for (let key in info[Key]){
+                             //遍历对象属性值
+                            console.log(key);
+                            console.log(info[Key][key]);
+                        }
+
+                    }
+
                 } else {
                     alert(result['error'])
 

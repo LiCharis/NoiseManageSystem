@@ -1,6 +1,7 @@
-
 # Register your models here.
 from django.contrib import admin
+from django.contrib.contenttypes.models import ContentType
+from django.http import HttpResponseRedirect
 from django.utils.safestring import mark_safe
 import requests
 from .models import Data
@@ -9,15 +10,15 @@ from .models import Data
 from django.contrib.admin.templatetags.admin_modify import *
 from django.contrib.admin.templatetags.admin_modify import submit_row as original_submit_row
 
+
 @register.inclusion_tag('admin/submit_line.html', takes_context=True)
 def submit_row(context):
     ctx = original_submit_row(context)
     ctx.update({
         'show_save_and_add_another': context.get('show_save_and_add_another', ctx['show_save_and_add_another']),
         'show_save_and_continue': context.get('show_save_and_continue', ctx['show_save_and_continue'])
-        })
+    })
     return ctx
-
 
 
 class DataManger(admin.ModelAdmin):
@@ -36,7 +37,7 @@ class DataManger(admin.ModelAdmin):
         extra_context['show_save_and_add_another'] = False
         extra_context['show_save_and_continue'] = False
         return super(DataManger, self).change_view(request, object_id,
-                                                  form_url, extra_context=extra_context)
+                                                   form_url, extra_context=extra_context)
 
     # # 重写编辑方法，将作为外键的用户选项自动填为当前登录用户
     # def save_model(self, request, obj, form, change):
@@ -69,8 +70,6 @@ class DataManger(admin.ModelAdmin):
             return True
         return False
 
-
-
     # 禁用删除
     def has_delete_permission(self, request, obj=None):
         return False
@@ -98,10 +97,6 @@ class DataManger(admin.ModelAdmin):
         html_str = f"<div>{update_btn} {delete_btn}</div>"
         return mark_safe(html_str)
 
-
-
-
-
     # 添加按钮
     actions = ['detail', 'output', 'analyse', 'compare']
 
@@ -114,13 +109,11 @@ class DataManger(admin.ModelAdmin):
     detail.type = 'success'
     detail.style = 'color:rainbow;'
 
-    #这里应该发送一个get请求给后端返回页面，然后页面快速发送ajax请求给后端同一个view（用get，post区分开）
-    #然后后端
-
+    # 这里应该发送一个get请求给后端返回页面，然后页面快速发送ajax请求给后端同一个view（用get，post区分开）
+    # 然后后端
 
     # detail.action_type = 1
     # detail.action_url = '/data/get_detail/' + str(selected_id)
-
 
     # 按钮的点击事件
     def output(self, request):
@@ -199,25 +192,47 @@ class DataManger(admin.ModelAdmin):
     analyse.icon = 'el-icon-s-data'
     analyse.type = 'warning'
     analyse.style = 'color:rainbow;'
-    analyse.action_type = 1
-    analyse.action_url = '/data/get_analyse'
+    # analyse.action_type = 1
+    # analyse.action_url = '/data/get_analyse'
+
 
     def compare(self, request, queryset):
-        dict = {}
-        url = 'http://127.0.0.1:8000/data/get_ids/'
+        # 获得被打钩的checkbox对应的对象id的列表
 
-        for obj in queryset:
-            dict.update({"key" + str(obj.id): str(obj.id)})
+        selected = queryset.values_list('pk', flat=True)
 
-        params = json.dumps(dict)
-        requests.post(url, data=params)
-        return True
+        # 获取对应的模型
+
+        ct = ContentType.objects.get_for_model(queryset.model)
+        print(selected)  #选择的数据
+        print(ct.pk)  #id号
+
+        # 构造访问的url，使用GET方法，跳转到相应的页面
+        return HttpResponseRedirect('/data/get_ids?model=%s&ids=%s' % (
+
+            ct,
+
+            ','.join(str(pk) for pk in selected),
+
+        ))
+    # dict = {}
+    # url = 'http://127.0.0.1:8000/data/get_ids/'
+    #
+    # for obj in queryset:
+    #     dict.update({"key" + str(obj.id): str(obj.id)})
+    #
+    # print(queryset)
+    #
+    # params = json.dumps(dict)
+    # requests.post(url, data=params)
+    # return True
 
     compare.short_description = '数据对比'
     compare.icon = 'el-icon-s-opportunity'
     compare.type = 'danger'
     compare.style = 'color:rainbow;'
-    compare.action_type = 1
-    compare.action_url = '/data/get_analyse'
+    # compare.action_type = 1
+    # compare.action_url = '/data/get_analyse'
+
 
 admin.site.register(Data, DataManger)

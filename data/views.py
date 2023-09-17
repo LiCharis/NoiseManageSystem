@@ -1,8 +1,9 @@
 import json
 
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
 from .models import Data
+
 
 def delete_true_view(request, duty_id):
     if not duty_id:
@@ -13,7 +14,7 @@ def delete_true_view(request, duty_id):
         data = Data.objects.get(id=duty_id)
 
     except Exception as e:
-        print('delete error is %s'%(e))
+        print('delete error is %s' % (e))
         return HttpResponse('--The note id is error')
     data.delete()
 
@@ -21,12 +22,10 @@ def delete_true_view(request, duty_id):
 
 
 def res_view(request):
-
     return render(request, 'ManageSystem/analyse.html')
 
 
 def analyse(request):
-
     analyseParam = request.POST['analyse']
     forceParam = request.POST['force']
     print(analyseParam)
@@ -36,19 +35,30 @@ def analyse(request):
     return render(request, 'ManageSystem/analyse.html', locals())
 
 
-
 def get_ids(request):
-    if request.method == 'POST':
-        json_str = request.body
-        json_dict = json.loads(json_str)
 
-        request.session['ids'] = json_dict
-        #先获取到所选中的用户id
-        print(json_dict)
+    if request.method == 'GET':
+        ids = request.GET.get('ids')
+        model = request.GET.get('model')
+        print(ids)
+        print(model)
+        id_list = ids.split(",")
+        request.session['ids'] = id_list
+        # 先获取到所选中的用户id
+        print("先获取到所选中的用户id", id_list)
 
-        return render(request, 'ManageSystem/analyse.html')
+        return HttpResponseRedirect("/data/get_analyse")
 
-
+    # elif request.method == 'POST':
+    #     json_str = request.body
+    #     json_dict = json.loads(json_str)
+    #
+    #     request.session['ids'] = json_dict
+    #     # 先获取到所选中的用户id
+    #     print("先获取到所选中的用户id", json_dict)
+    #
+    #     # return render(request, 'ManageSystem/analyse.html')
+    #     return HttpResponseRedirect("/data/get_analyse")
 
 
 def get_fields(request):
@@ -56,38 +66,28 @@ def get_fields(request):
         json_str = request.body
         json_dict = json.loads(json_str)
         request.session['fields'] = json_dict
-        print(request.session['ids'])
-        print(request.session['fields'])
+        print(request.session.get('ids'))
+        print(request.session.get('fields'))
         ids = []
+
+        for i in request.session['ids']:
+            ids.append(int(i))
+
         info = {}
-        try:
 
-            for k, v in request.session['ids'].items:
-                ids.append(int(v))
+        datas = Data.objects.filter(id__in=ids)
+        print(datas)
 
-            datas = Data.objects.filter(id__in=ids)
-            print(datas)
+        for obj in datas:
+            fields = {}
+            for k, v in request.session.get('fields').items():
 
-            for obj in datas:
-                fields = {}
-                for k, v in request.session['fields'].items:
-                    fields.update({k, getattr(obj, k)})
+                fields.update({v: getattr(obj, v)})
 
-                info.update({str(obj.id): fields})
-        except Exception as e:
-            error = "出错了!"
-            print("here", e)
-            return JsonResponse({"code": 500, "error": error})
+            info.update({str(obj.id): fields})
 
-        result = {"code": 200, "mes": info}
+    result = {"code": 200, "mes": info}
 
-        #这里就根据前端给的字段对应的数据返回数据
+    # 这里就根据前端给的字段对应的数据返回数据
 
-        return JsonResponse(result)
-
-
-
-
-
-
-
+    return JsonResponse(result)
