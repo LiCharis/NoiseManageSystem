@@ -6,33 +6,69 @@ from .models import Data
 
 
 def delete_true_view(request, duty_id):
+    print(request.path)
     if not duty_id:
         return HttpResponse('请求异常')
+
+    if request.method == 'GET':
+        action = request.path
+
+        try:
+            print("delete_true_view")
+            print(duty_id)
+
+            obj = Data.objects.get(id=duty_id).__dict__
+            print(obj)
+
+        except Exception as e:
+            print('delete error is %s' % (e))
+
+        return render(request, 'ManageSystem/delete.html', locals())
+
+
+    elif request.method == 'POST':
+
+        if request.POST['cancel']:
+            print(request.POST['cancel'])
+            return HttpResponseRedirect("/admin/data/data")
+
+        try:
+            print("delete_true_view")
+            print(duty_id)
+            Data.objects.get(id=duty_id).delete()
+
+        except Exception as e:
+            print('delete error is %s' % (e))
+            return HttpResponse('--The note id is error')
+
+    return HttpResponseRedirect("/admin/data/data")
+
+# def res_view(request):
+#     return render(request, 'ManageSystem/analyse.html')
+#
+#
+# def analyse(request):
+#     analyseParam = request.POST['analyse']
+#     forceParam = request.POST['force']
+#     print(analyseParam)
+#     print(forceParam)
+#     request.res = 'res'
+#     result_url = "/static/images/交大鸽子.jpg"
+#     return render(request, 'ManageSystem/analyse.html', locals())
+#
+
+def get_details(request, id):
+
+    if not id:
+        return HttpResponse('请求异常')
+
     try:
-        print("delete_true_view")
-        print(duty_id)
-        data = Data.objects.get(id=duty_id)
+        obj = Data.objects.get(id=id)
 
     except Exception as e:
-        print('delete error is %s' % (e))
-        return HttpResponse('--The note id is error')
-    data.delete()
+        print(e)
 
-    return HttpResponse('删除成功!<a href = "/admin/duty/duty">返回</a>')
-
-
-def res_view(request):
-    return render(request, 'ManageSystem/analyse.html')
-
-
-def analyse(request):
-    analyseParam = request.POST['analyse']
-    forceParam = request.POST['force']
-    print(analyseParam)
-    print(forceParam)
-    request.res = 'res'
-    result_url = "/static/images/交大鸽子.jpg"
-    return render(request, 'ManageSystem/analyse.html', locals())
+    return render(request, 'ManageSystem/details.html', locals())
 
 
 def get_ids(request):
@@ -47,7 +83,7 @@ def get_ids(request):
         # 先获取到所选中的用户id
         print("先获取到所选中的用户id", id_list)
 
-        return HttpResponseRedirect("/data/get_analyse")
+        return render(request, 'ManageSystem/analyse.html')
 
     # elif request.method == 'POST':
     #     json_str = request.body
@@ -73,18 +109,18 @@ def get_fields(request):
         for i in request.session['ids']:
             ids.append(int(i))
 
-        info = {}
+        info = []
 
         datas = Data.objects.filter(id__in=ids)
         print(datas)
 
         for obj in datas:
-            fields = {}
+            fields = {"id": obj.id}
             for k, v in request.session.get('fields').items():
 
                 fields.update({v: getattr(obj, v)})
 
-            info.update({str(obj.id): fields})
+            info.append(fields)
 
     result = {"code": 200, "mes": info}
 

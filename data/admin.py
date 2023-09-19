@@ -22,7 +22,7 @@ def submit_row(context):
 
 
 class DataManger(admin.ModelAdmin):
-    list_display = ['car', 'status', 'speed', 'result', 'showFig', 'operate']
+    list_display = ['car', 'status', 'speed', 'result', 'detail', 'showFig', 'operate']
     list_display_links = None
     search_fields = []
     list_filter = ('car', 'speed', 'status', 'first_left', 'first_right', 'second_left', 'second_right', 'result')
@@ -74,6 +74,10 @@ class DataManger(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+
+
+
+
     @admin.display(description='声品质彩图', ordering='id')
     def showFig(self, obj):
         picture = '{"icon": "fas fa-user-tie","url": "/static/images/头像.jpg"}'
@@ -90,7 +94,7 @@ class DataManger(admin.ModelAdmin):
                                      class='el-icon-edit el-button el-button--primary el-button--small'>编辑</button>"""
 
         # 删除按钮
-        data2 = '{"icon": "fas fa-user-tie","url": "/duty/single_delete/%d"}' % (obj.id)
+        data2 = '{"icon": "fas fa-user-tie","url": "/data/single_delete/%d"}' % (obj.id)
         delete_btn = f"""<button onclick='self.parent.app.openTab({data2})' 
                                 class='el-icon-delete-solid el-button el-button--danger el-button--small'>删除</button>"""
 
@@ -98,16 +102,19 @@ class DataManger(admin.ModelAdmin):
         return mark_safe(html_str)
 
     # 添加按钮
-    actions = ['detail', 'output', 'analyse', 'compare']
+    actions = ['output', 'analyse', 'compare']
 
-    def detail(self, request, queryset):
 
-        return True
+    @admin.display(description='详细信息', ordering='id')
+    def detail(self, obj):
 
-    detail.short_description = '数据详情'
-    detail.icon = 'el-icon-s-opportunity'
-    detail.type = 'success'
-    detail.style = 'color:rainbow;'
+
+        show_link = "<a href='/data/get_details/%d'>查看</a>"  %(obj.id)
+
+
+        return mark_safe(f"{show_link}")
+
+
 
     # 这里应该发送一个get请求给后端返回页面，然后页面快速发送ajax请求给后端同一个view（用get，post区分开）
     # 然后后端

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>细节呈现</title>
+</head>
+<body>
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+    <table border="2">
+        <h1 style="color: red">数据详情</h1>
+
+
+        <tr>
+            <th>汽车品牌</th>
+            <th>方案</th>
+            <th>工况-Vpp</th>
+            <th>测量次数</th>
+            <th>AA-BB内最大声压级（左侧）-SPL_L</th>
+            <th>AA-BB内最大声压级（右侧）-SPL_R</th>
+            <th>通过噪声最终结果 dB(A)</th>
+        </tr>
+        <tr>
+            <td rowspan="2">{{ obj.car }}</td>
+            <td rowspan="2">{{ obj.speed }}</td>
+            <td rowspan="2">{{ obj.condition }}</td>
+            <td>第一次</td>
+            <td>{{ obj.first_left }}</td>
+            <td>{{ obj.second_left }}</td>
+            <td rowspan="2">{{ obj.result }}</td>
+
+        </tr>
+        <tr>
+            <td>第二次</td>
+            <td>{{ obj.first_right }}</td>
+            <td>{{ obj.second_right }}</td>
+        </tr>
+
+
+    </table>
+    <br>
+    <br>
+
+    <form method="get" action="/admin/data/data">
+
+        <p>
+
+            <input type="submit" value="返回"/>
+        </p>
+    </form>
+
+
+
+{% endblock %}
+</body>
+<script>
+    function res() {
+        window.location.href = '/admin/data/data'
+    }
+</script>
+</html>

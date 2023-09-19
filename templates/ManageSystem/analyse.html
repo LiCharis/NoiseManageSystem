@@ -48,17 +48,9 @@
                 if (result['code'] === 200) {
 
                     const info = result['mes'];
-
-                    for (let Key in info) {
-                        //遍历对象属性
-                        console.log(Key);
-                        for (let key in info[Key]){
-                             //遍历对象属性值
-                            console.log(key);
-                            console.log(info[Key][key]);
-                        }
-
-                    }
+                    const objs = JSON.stringify(info)
+                    alert(objs);
+                    console.log(info[0]['result'])
 
                 } else {
                     alert(result['error'])
