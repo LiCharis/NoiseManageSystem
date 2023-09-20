@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <title>实验数据对比</title>
+</head>
+<body>
+<div class="container">
+    <h1>数据对比</h1>
+    <form action="/data/compare" method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-3">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" value="声压" name="type">
+                        声压
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" value="响度" name="type">
+                        响度
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" value="波动度" name='type'>
+                        波动度
+                    </label>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" value="语言清晰度" name='type'>
+                        语言清晰度
+                    </label>
+                </div>
+            </div>
+        </div>
+        <input type="submit" class="btn-primary" value="确定">
+    </form>
+</div>
+
+<div style="margin-left: 20%;margin-top: 10%">
+    {{ bar_chart |safe }}
+</div>
+
+
+<script src="/static/js/jquery-3.3.1.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+</body>
+</html>

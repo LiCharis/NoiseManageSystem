@@ -2,8 +2,11 @@
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponseRedirect
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 import requests
+
+from ManageSystem.settings import MEDIA_URL
 from .models import Data
 # Register your models here.
 
@@ -22,12 +25,12 @@ def submit_row(context):
 
 
 class DataManger(admin.ModelAdmin):
-    list_display = ['car', 'status', 'speed', 'result', 'detail', 'showFig', 'operate']
+    list_display = ['car', 'status', 'speed', 'condition', 'result', 'detail', 'showFig', 'operate']
     list_display_links = None
     search_fields = []
-    list_filter = ('car', 'speed', 'status', 'first_left', 'first_right', 'second_left', 'second_right', 'result')
-    list_per_page = 5
-    list_max_show_all = 5
+    list_filter = ('car', 'speed', 'status', 'condition', 'first_left', 'first_right', 'second_left', 'second_right', 'result')
+    list_per_page = 7
+    list_max_show_all = 7
 
     selected_id = []
 
@@ -74,16 +77,20 @@ class DataManger(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
-
-
-
-
     @admin.display(description='声品质彩图', ordering='id')
     def showFig(self, obj):
-        picture = '{"icon": "fas fa-user-tie","url": "/static/images/头像.jpg"}'
-        show_btn = f"""<button onclick='self.parent.app.openTab({picture})'
-                                             class='el-icon-picture el-button el-button--warning el-button--small'>查看</button>"""
-        return mark_safe(f"<div>{show_btn}</div>")
+        if obj.image:
+            url = (MEDIA_URL + obj.image.name)
+            return format_html(
+                '<a title="点击放大" href="{}"><img alt="文件未上传" src="{}" style="width:50px;height:40px;"/></a>'.format(url, url))
+        return ""
+
+    # @admin.display(description='声品质彩图', ordering='id')
+    # def showFig(self, obj):
+    #     picture = '{"icon": "fas fa-user-tie","url": "/static/images/头像.jpg"}'
+    #     show_btn = f"""<button onclick='self.parent.app.openTab({picture})'
+    #                                          class='el-icon-picture el-button el-button--warning el-button--small'>查看</button>"""
+    #     return mark_safe(f"<div>{show_btn}</div>")
 
     # 定义一些操作示例
     @admin.display(description='操作', ordering='id')

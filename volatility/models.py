@@ -14,6 +14,7 @@ class Volatility(models.Model):
     status = models.CharField(verbose_name='荷载状态', max_length=100)
     left = models.FloatField(verbose_name='波动度左耳-vacil')
     right = models.FloatField(verbose_name='波动度右耳-vacil')
+    image = models.FileField(upload_to='upload_image', default=" ")
 
     class Meta:
         verbose_name = 'volatility'

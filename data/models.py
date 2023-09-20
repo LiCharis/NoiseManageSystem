@@ -27,6 +27,8 @@ class Data(models.Model):
     first_right = models.FloatField(verbose_name='测量次数一AA-BB内最大声压级（右侧）-SPL_R')
     second_left = models.FloatField(verbose_name='测量次数二AA-BB内最大声压级（左侧）-SPL_L')
     second_right = models.FloatField(verbose_name='测量次数二AA-BB内最大声压级（右侧）-SPL_R')
+    image = models.FileField(upload_to='upload_image', default=" ")
+
     result = models.FloatField(verbose_name='通过噪声最终结果')
 
     class Meta:

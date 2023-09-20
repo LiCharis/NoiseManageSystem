@@ -3,7 +3,6 @@ from django.db import models
 # Create your models here.
 from car.models import Car
 
-
 class Loudness(models.Model):
 
     create_time = models.DateTimeField(verbose_name='时间', auto_now_add=True)
@@ -14,8 +13,10 @@ class Loudness(models.Model):
     status = models.CharField(verbose_name='荷载状态', max_length=100)
     left = models.FloatField(verbose_name='响度左耳-sone')
     right = models.FloatField(verbose_name='响度右耳-sone')
+    image = models.FileField(upload_to='upload_image', default=" ")
 
     class Meta:
         verbose_name = 'loudness'
         db_table = 'loudness'
         verbose_name_plural = verbose_name
+

@@ -14,6 +14,7 @@ class Sharpness(models.Model):
     status = models.CharField(verbose_name='荷载状态', max_length=100)
     left = models.FloatField(verbose_name='尖锐度左耳-acum')
     right = models.FloatField(verbose_name='尖锐度右耳-acum')
+    image = models.FileField(upload_to='upload_image', default=" ")
 
     class Meta:
         verbose_name = 'sharpness'

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<!--
+		1.表格的跨行与跨列
+			colspan|rowspan  针对的是单元格
+		rowspan  跨行
+		colspan  跨列
+			算上本身
+	 -->
+	 <table width="50%" border="1">
+	 	<tr>
+	 		<td colspan="3">item1</td>
+	 		<!-- <td>item2</td>
+	 		<td>item3</td> -->
+	 	</tr>
+	 	<tr>
+	 		<td>item1</td>
+	 		<td rowspan = "2">item2</td>
+	 		<td>item3</td>
+	 	</tr>
+	 	<tr>
+	 		<td>item1</td>
+	 		<!-- <td>item2</td> -->
+	 		<td>item3</td>
+	 	</tr>
+	 </table>
+</body>
+</html>

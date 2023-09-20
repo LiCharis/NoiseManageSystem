@@ -13,6 +13,7 @@ class Clarity(models.Model):
     status = models.CharField(verbose_name='荷载状态', max_length=100)
     left = models.FloatField(verbose_name='语音清晰度度左耳-%')
     right = models.FloatField(verbose_name='语音清晰度度右耳-%')
+    image = models.FileField(upload_to='upload_image', default=" ")
 
 
     class Meta:

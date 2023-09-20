@@ -7,5 +7,6 @@ urlpatterns = [
     # path('ret_analyse', views.analyse),
     path('get_ids/', views.get_ids),
     path('get_fields/', views.get_fields),
-    path('get_details/<int:id>', views.get_details)
+    path('get_details/<int:id>', views.get_details),
+    path('compare', views.compare)
 ]

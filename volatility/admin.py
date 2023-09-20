@@ -1,8 +1,10 @@
 
 # Register your models here.
 from django.contrib import admin
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
+from ManageSystem.settings import MEDIA_URL
 from .models import Volatility
 # Register your models here.
 
@@ -22,7 +24,7 @@ def submit_row(context):
 
 
 class VolatilityManger(admin.ModelAdmin):
-    list_display = ['car', 'speed', 'status', 'left', 'right', 'operate']
+    list_display = ['car', 'status', 'speed', 'condition', 'left', 'right', 'showFig', 'operate']
     list_display_links = None
     search_fields = []
     list_filter = ('car', 'speed', 'status', 'left', 'right')
@@ -59,6 +61,15 @@ class VolatilityManger(admin.ModelAdmin):
     # 禁用删除
     def has_delete_permission(self, request, obj=None):
         return False
+
+    @admin.display(description='声品质彩图', ordering='id')
+    def showFig(self, obj):
+        if obj.image:
+            url = (MEDIA_URL + obj.image.name)
+            return format_html('<a title="点击放大" href="{}"><img alt="文件未上传" src="{}" style="width:50px;height:40px;"/></a>'.format(url, url))
+        return ""
+
+
 
     # 定义一些操作示例
     @admin.display(description='操作', ordering='id')
