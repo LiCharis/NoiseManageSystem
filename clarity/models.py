@@ -20,3 +20,6 @@ class Clarity(models.Model):
         verbose_name = 'clarity'
         db_table = 'clarity'
         verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return '左耳: %s |  右耳: %s' % (self.left, self.right)

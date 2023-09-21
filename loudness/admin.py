@@ -30,6 +30,15 @@ class LoudnessManger(admin.ModelAdmin):
     list_per_page = 5
     list_max_show_all = 5
 
+    # # 重写编辑方法，将作为外键的用户选项自动填为当前登录用户
+    # def save_model(self, request, obj, form, change):
+    #     # If creating new article, associate request.user with author.
+    #     if not change:
+    #         loudness_obj = Loudness.objects.get()
+    #     super().save_model(request, obj, form, change)
+
+
+
     @admin.display(description='声品质彩图', ordering='id')
     def showFig(self, obj):
         if obj.image:

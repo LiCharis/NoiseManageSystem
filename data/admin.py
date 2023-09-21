@@ -4,10 +4,16 @@ from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-import requests
+
+from car.models import Car
+from clarity.models import Clarity
+from loudness.models import Loudness
+from sharpness.models import Sharpness
+from volatility.models import Volatility
 
 from ManageSystem.settings import MEDIA_URL
 from .models import Data
+from loudness.models import Loudness
 # Register your models here.
 
 from django.contrib.admin.templatetags.admin_modify import *
@@ -24,8 +30,9 @@ def submit_row(context):
     return ctx
 
 
+
 class DataManger(admin.ModelAdmin):
-    list_display = ['car', 'status', 'speed', 'condition', 'result', 'detail', 'showFig', 'operate']
+    list_display = ['car', 'status', 'speed', 'condition', 'result', 'loudness_left_and_right', 'sharpness_left_and_right', 'volatility_left_and_right', 'clarity_left_and_right', 'detail', 'showFig', 'operate']
     list_display_links = None
     search_fields = []
     list_filter = ('car', 'speed', 'status', 'condition', 'first_left', 'first_right', 'second_left', 'second_right', 'result')
@@ -33,6 +40,9 @@ class DataManger(admin.ModelAdmin):
     list_max_show_all = 7
 
     selected_id = []
+
+
+
 
     # 重写方法屏蔽按钮
     def change_view(self, request, object_id, form_url='', extra_context=None):
@@ -46,7 +56,7 @@ class DataManger(admin.ModelAdmin):
     # def save_model(self, request, obj, form, change):
     #     # If creating new article, associate request.user with author.
     #     if not change:
-    #         obj.user_id = request.user.id
+    #         loudness_obj = Loudness.objects.get()
     #     super().save_model(request, obj, form, change)
 
     # # 重写查看返回方法，超级管理员可以查看所有数据，否则只可以看到自己创建的数据
@@ -75,7 +85,35 @@ class DataManger(admin.ModelAdmin):
 
     # 禁用删除
     def has_delete_permission(self, request, obj=None):
+
         return False
+
+    @admin.display(description='响度', ordering='id')
+    def loudness_left_and_right(self, obj):
+        loudness_obj = Loudness.objects.get(id=obj.loudness_id)
+
+        return "%s  |  %s" % (loudness_obj.left, loudness_obj.right)
+
+    @admin.display(description='尖锐度', ordering='id')
+    def sharpness_left_and_right(self, obj):
+        sharpness_obj = Sharpness.objects.get(id=obj.sharpness_id)
+
+        return "%s  |  %s" % (sharpness_obj.left, sharpness_obj.right)
+
+
+    @admin.display(description='波动度', ordering='id')
+    def volatility_left_and_right(self, obj):
+        volatility_obj = Volatility.objects.get(id=obj.volatility_id)
+
+        return "%s  |  %s" % (volatility_obj.left, volatility_obj.right)
+
+    @admin.display(description='语音清晰度', ordering='id')
+    def clarity_left_and_right(self, obj):
+        clarity_obj = Clarity.objects.get(id=obj.clarity_id)
+
+        return "%s  |  %s" % (clarity_obj.left, clarity_obj.right)
+
+
 
     @admin.display(description='声品质彩图', ordering='id')
     def showFig(self, obj):

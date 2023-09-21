@@ -28,7 +28,7 @@ def delete_true_view(request, duty_id):
 
     elif request.method == 'POST':
 
-        if request.POST['cancel']:
+        if request.POST.get('cancel'):
             print(request.POST['cancel'])
             return HttpResponseRedirect("/admin/loudness/loudness")
 

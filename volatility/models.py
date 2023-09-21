@@ -20,3 +20,6 @@ class Volatility(models.Model):
         verbose_name = 'volatility'
         db_table = 'volatility'
         verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return '左耳: %s |  右耳: %s' % (self.left, self.right)

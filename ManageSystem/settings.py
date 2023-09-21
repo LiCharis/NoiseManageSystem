@@ -15,7 +15,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = 'django-insecure-be0ecb-)q9xl!$dsben36fkqzu((@k3**)(1r_58^r2xeq=-mo
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -51,7 +49,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    #'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -77,7 +75,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ManageSystem.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
@@ -88,10 +85,12 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': '123456',
         'HOST': '127.0.0.1',
-        'POST': '3306'
+        'POST': '3306',
+        'OPTIONS': {
+            "init_command": "SET foreign_key_checks = 0;",
+        }
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -111,7 +110,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
@@ -122,8 +120,6 @@ TIME_ZONE = 'Asia/Shanghai'
 USE_I18N = True
 
 USE_TZ = True
-
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
@@ -138,14 +134,10 @@ MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
 
 # 换成自己Logo链接
 SIMPLEUI_LOGO = '/static/images/头像.jpg'
@@ -157,7 +149,6 @@ SIMPLEUI_ANALYSIS = False
 # 隐藏首页的快捷操作和最近动作
 SIMPLEUI_HOME_QUICK = False
 SIMPLEUI_HOME_ACTION = False
-
 
 SIMPLEUI_CONFIG = {
     # 是否使用系统默认菜单，自定义菜单时建议关闭。
@@ -216,7 +207,7 @@ SIMPLEUI_CONFIG = {
                 },
             ]
         },
-{
+        {
             'app': 'user',
             'name': '用户管理',
             'icon': 'fa fa-th-list',
@@ -238,10 +229,9 @@ SIMPLEUI_CONFIG = {
     ]
 }
 
-AUTH_USER_MODEL='user.User'
+AUTH_USER_MODEL = 'user.User'
 
-#修改首页设置, 指向新创建的控制面板
+# 修改首页设置, 指向新创建的控制面板
 SIMPLEUI_HOME_PAGE = '/ManageSystem/dashboard'
 SIMPLEUI_HOME_TITLE = '主页'
 SIMPLEUI_HOME_ICON = 'fa fa-eye'
-
