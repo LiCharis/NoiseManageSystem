@@ -41,10 +41,13 @@ class LoudnessManger(admin.ModelAdmin):
 
     @admin.display(description='声品质彩图', ordering='id')
     def showFig(self, obj):
-        if obj.image:
+        if not obj.image == " ":
             url = (MEDIA_URL + obj.image.name)
-            return format_html('<a title="点击放大" href="{}"><img alt="文件未上传" src="{}" style="width:50px;height:40px;"/></a>'.format(url, url))
-        return ""
+        else:
+            url = ""
+        return format_html(
+            '<a title="点击放大" href="{}"><img alt="文件未上传" src="{}" style="width:50px;height:40px;"/></a>'.format(url,
+                                                                                                               url))
 
     # image_tag.action_type = 1
     # image_tag.action_url =
