@@ -8,49 +8,10 @@
 </head>
 <body>
 <div class="container">
-    <h1>数据对比</h1>
-    <form action="/data/compare" method="post">
-        {% csrf_token %}
-        <div class="row">
-            <div class="col-md-3">
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" value="声压" name="type">
-                        声压
-                    </label>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" value="响度" name="type">
-                        响度
-                    </label>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" value="波动度" name='type'>
-                        波动度
-                    </label>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" value="语言清晰度" name='type'>
-                        语言清晰度
-                    </label>
-                </div>
-            </div>
-        </div>
-        <input type="submit" class="btn-primary" value="确定">
-    </form>
+    <h1 style="text-align:center">数据对比</h1>
 </div>
 
-<div style="margin-left: 20%;margin-top: 10%">
+<div style="margin-left: 20%;margin-top: 10%;height:60vh;width:70vw">
     {{ bar_chart |safe }}
 </div>
 

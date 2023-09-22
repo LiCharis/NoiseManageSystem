@@ -195,9 +195,11 @@ class DataManger(admin.ModelAdmin):
     # 设置了action_type，不设置url，页面内将报错
     # 设置成链接类型的按钮后，custom_button方法将不会执行。
 
-    def analyse(self, request):
-        print("hello")
-        return True
+    def analyse(self, request,queryset):
+        selected = queryset.values_list('pk', flat=True)
+
+        # 构造访问的url，使用GET方法，跳转到相应的页面
+        return HttpResponseRedirect("/data/compare/{}".format('.'.join(str(pk) for pk in selected)))
 
     # analyse.layer = {
     #     # 弹出层中的输入框配置

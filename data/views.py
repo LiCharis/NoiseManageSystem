@@ -134,7 +134,10 @@ def get_fields(request):
 
     return JsonResponse(result)
 
-def compare(request):
+def compare(request, ids):
+    print(ids)
+    id_list = ids.split(".")
+
     cars = Car.objects.all()
     categories = []
     sound_pressure_list = []
@@ -145,70 +148,63 @@ def compare(request):
     volatility_left = []
     volatility_right = []
 
-    for car in cars:
-        categories.append(str(car.brand))
+    for id in id_list:
+        data = Data.objects.get(id=id)
+        # categories.append(
+        #     str(str(data.speed) + '/' + str(data.condition) + '/' + str(data.status) + '/' + str(
+        #         data.car.brand) + '/' + str(data.car.model)))
+        categories.append(str(str(data.condition) + '/'+str(data.car.brand)))
+        sound_pressure_list.append(data.result)
+        clarity_left.append(data.clarity.left)
+        clarity_right.append(data.clarity.right)
+        loudness_left.append(data.loudness.left)
+        loudness_right.append(data.loudness.right)
+        volatility_left.append(data.volatility.left)
+        volatility_right.append(data.volatility.right)
 
-        if Data.objects.filter(car=car):
-            sound_pressure_list.append(Data.objects.filter(car=car).first().result)
-        else:
-            sound_pressure_list.append(0)
+        print(categories)
+        print(sound_pressure_list)
+        print(clarity_left)
+        print(clarity_right)
+        print(loudness_left)
+        print(loudness_right)
+        print(volatility_left)
+        print(volatility_right)
 
-        if Clarity.objects.filter(car=car):
-            clarity_left.append(Clarity.objects.filter(car=car).first().left)
-            clarity_right.append(Clarity.objects.filter(car=car).first().right)
-        else:
-            clarity_left.append(0)
-            clarity_right.append(0)
+        # 提取车型名称和各项数据
 
-        if Loudness.objects.filter(car=car):
-            loudness_left.append(Loudness.objects.filter(car=car).first().left)
-            loudness_right.append(Loudness.objects.filter(car=car).first().right)
-        else:
-            loudness_left.append(0)
-            loudness_right.append(0)
+        # 创建横向柱状图
+        from pyecharts import options as opts
+        from pyecharts.charts import Bar
 
-        if Volatility.objects.filter(car=car):
-            volatility_left.append(Volatility.objects.filter(car=car).first().left)
-            volatility_right.append(Volatility.objects.filter(car=car).first().right)
-        else:
-            volatility_left.append(0)
-            volatility_right.append(0)
+        # 假设categories、sound_pressure_list等变量已定义
 
-    print(categories)
-    print(sound_pressure_list)
-    print(clarity_left)
-    print(clarity_right)
-    print(loudness_left)
-    print(loudness_right)
-    print(volatility_left)
-    print(volatility_right)
-
-    # 提取车型名称和各项数据
-
-    # 创建横向柱状图
-    bar = (
-        Bar()
-        .add_xaxis(categories)
-        .add_yaxis("声压", sound_pressure_list, category_gap="50%")  # 设置category_gap以调整柱状图之间的间距
-        .add_yaxis("响度左耳", loudness_left, category_gap="50%", stack='stack_1')
-        .add_yaxis("响度右耳", loudness_right, category_gap="50%", stack='stack_1')
-        .add_yaxis("波动度左耳", volatility_left, category_gap="50%", stack='stack_2')
-        .add_yaxis("波动度右耳", volatility_right, category_gap="50%", stack='stack_2')
-        .add_yaxis("语言清晰度左耳", clarity_left, category_gap="50%", stack='stack_3')
-        .add_yaxis("语言清晰度右耳", clarity_right, category_gap="50%", stack='stack_3')
-        .reversal_axis()  # 使用reversal_axis方法将x轴和y轴对调
-        .set_global_opts(
-            title_opts=opts.TitleOpts(),
-            yaxis_opts=opts.AxisOpts(
-                name="车型",
-            ),
-            xaxis_opts=opts.AxisOpts(name="数值"),  # 设置x轴标签为数值
-            legend_opts=opts.LegendOpts(
-                pos_top="0%",
-                pos_left="0%",
-            ),
+        bar = (
+            Bar(init_opts=opts.InitOpts(width="80vw"))
+            .add_xaxis(categories)
+            .add_yaxis("声压", sound_pressure_list, category_gap="50%")
+            .add_yaxis("响度左耳", loudness_left, category_gap="50%", stack='stack_1')
+            .add_yaxis("响度右耳", loudness_right, category_gap="50%", stack='stack_1')
+            .add_yaxis("波动度左耳", volatility_left, category_gap="50%", stack='stack_2')
+            .add_yaxis("波动度右耳", volatility_right, category_gap="50%", stack='stack_2')
+            .add_yaxis("语言清晰度左耳", clarity_left, category_gap="50%", stack='stack_3')
+            .add_yaxis("语言清晰度右耳", clarity_right, category_gap="50%", stack='stack_3')
+            .reversal_axis()
+            .set_global_opts(
+                title_opts=opts.TitleOpts(),
+                yaxis_opts=opts.AxisOpts(
+                    name="车型",
+                    axislabel_opts=opts.LabelOpts(formatter="{value}",rotate=45),  # 使用自定义格式化函数
+                ),
+                xaxis_opts=opts.AxisOpts(
+                    name="数值",
+                ),
+                legend_opts=opts.LegendOpts(
+                    pos_top="0%",
+                    pos_left="0%",
+                ),
+            )
         )
-    )
 
-    context = {'bar_chart': bar.render_embed(), 'flag': True}
+        context = {'bar_chart': bar.render_embed(), 'flag': True}
     return render(request, 'ManageSystem/compare.html', context)
