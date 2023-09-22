@@ -19,8 +19,8 @@ class UserManger(admin.ModelAdmin):
     list_display_links = None
     search_fields = []
     list_filter = ('username', 'name', 'agency', 'department')
-    list_per_page = 5
-    list_max_show_all = 5
+    list_per_page = 7
+    list_max_show_all = 7
 
     @register.inclusion_tag('admin/submit_line.html', takes_context=True)
     def submit_row(context):

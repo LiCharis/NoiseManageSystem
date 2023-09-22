@@ -27,8 +27,8 @@ class LoudnessManger(admin.ModelAdmin):
     list_display_links = None
     search_fields = []
     list_filter = ('car', 'speed', 'status', 'left', 'right')
-    list_per_page = 5
-    list_max_show_all = 5
+    list_per_page = 7
+    list_max_show_all = 7
 
     # # 重写编辑方法，将作为外键的用户选项自动填为当前登录用户
     # def save_model(self, request, obj, form, change):

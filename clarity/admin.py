@@ -27,8 +27,8 @@ class ClarityManger(admin.ModelAdmin):
     list_display_links = None
     search_fields = []
     list_filter = ('car', 'speed', 'status', 'left', 'right')
-    list_per_page = 5
-    list_max_show_all = 5
+    list_per_page = 7
+    list_max_show_all = 7
 
     # 重写方法屏蔽按钮
     def change_view(self, request, object_id, form_url='', extra_context=None):

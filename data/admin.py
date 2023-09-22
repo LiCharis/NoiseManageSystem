@@ -32,7 +32,7 @@ def submit_row(context):
 
 
 class DataManger(admin.ModelAdmin):
-    list_display = ['car', 'status', 'speed', 'condition', 'result', 'loudness_left_and_right', 'sharpness_left_and_right', 'volatility_left_and_right', 'clarity_left_and_right', 'detail', 'showFig', 'operate']
+    list_display = ['car', 'power', 'status', 'speed', 'condition', 'result', 'loudness_left_and_right', 'sharpness_left_and_right', 'volatility_left_and_right', 'clarity_left_and_right', 'detail', 'showFig', 'operate']
     list_display_links = None
     search_fields = []
     list_filter = ('car', 'speed', 'status', 'condition', 'first_left', 'first_right', 'second_left', 'second_right', 'result')
@@ -140,10 +140,18 @@ class DataManger(admin.ModelAdmin):
         update_btn = f"""<button onclick='self.parent.app.openTab({data1})'
                                      class='el-icon-edit el-button el-button--primary el-button--small'>编辑</button>"""
 
+        # data1 = "/admin/data/data/%d/change/" % (obj.id)
+
+        # update_btn = '<a class="el-icon-edit el-link--primary"   href="{}">编辑</a>'.format(data1)
+        # update_btn = "<button onclick='window.location.href=%s' class='el-icon-edit el-button el-button--primary el-button--small'>编辑</button>" %(data1)
+
+
         # 删除按钮
         data2 = '{"icon": "fas fa-user-tie","url": "/data/single_delete/%d"}' % (obj.id)
-        delete_btn = f"""<button onclick='self.parent.app.openTab({data2})' 
+        # data2 = "/data/single_delete/%d" % (obj.id)
+        delete_btn = f"""<button onclick='self.parent.app.openTab({data2})'
                                 class='el-icon-delete-solid el-button el-button--danger el-button--small'>删除</button>"""
+        # delete_btn = '<a class="el-icon-delete-solid el-link--danger"  href="{}">删除</a>'.format(data2)
 
         html_str = f"<div>{update_btn} {delete_btn}</div>"
         return mark_safe(html_str)

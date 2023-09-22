@@ -8,6 +8,7 @@ from .models import Car
 from django.http import HttpResponseRedirect
 # Register your models here.
 
+
 from django.contrib.admin.templatetags.admin_modify import *
 from django.contrib.admin.templatetags.admin_modify import submit_row as original_submit_row
 
@@ -31,7 +32,6 @@ class CarManger(admin.ModelAdmin):
     list_filter = ('model', 'brand')
     list_per_page = 5
     list_max_show_all = 5
-
 
 
 
