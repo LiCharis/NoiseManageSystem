@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>删除确认</title>
+</head>
+<body>
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+    <h1 style="color: red">将删除以下数据</h1>
+    <ul style="font-size: 20px">
+    {% for k,v in obj.items %}
+        <li>{{ k }}: {{ v }}</li>
+    {% endfor %}
+    </ul>
+
+
+
+    <form method="post" action="{{ action }}">
+
+        <p>
+            <input type="submit" name="cancel" value="取消"/>
+            <input type="submit" value="确定"/>
+        </p>
+    </form>
+
+
+
+{% endblock %}
+</body>
+</html>

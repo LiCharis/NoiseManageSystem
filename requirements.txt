@@ -1,0 +1,5 @@
+django
+pyecharts
+pillow
+mysqlclient
+```

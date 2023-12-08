@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>查看图片</title>
+</head>
+<body>
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+    <h1 style="color: red">{{ dataname }}-图片预览</h1>
+    <img src="{{ url }}" width="1100" height="550">
+
+    <form method="get" action="{{action}}">
+
+        <p>
+
+            <input type="submit" value="返回"/>
+        </p>
+    </form>
+
+{% endblock %}
+</body>
+</html>
