@@ -31,7 +31,8 @@ urlpatterns = [
     path('volatility/', include('volatility.urls')),
     path('clarity/', include('clarity.urls')),
     path('user/', include('user.urls')),
-    path('evaluation/', include('evaluation.urls'))
+    path('evaluation/', include('evaluation.urls')),
+    path('total/', include('total.urls'))
 
 ]
 

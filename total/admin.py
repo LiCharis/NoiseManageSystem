@@ -2,15 +2,18 @@
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponseRedirect
-from django.utils.html import format_html
+
 from django.utils.safestring import mark_safe
 
-from ManageSystem.settings import MEDIA_URL
-from .models import Volatility
 # Register your models here.
 
 from django.contrib.admin.templatetags.admin_modify import *
 from django.contrib.admin.templatetags.admin_modify import submit_row as original_submit_row
+from import_export.admin import ExportMixin
+from import_export.formats import base_formats
+
+from total.models import Total
+from total.resource import TotalResource
 
 
 @register.inclusion_tag('admin/submit_line.html', takes_context=True)
@@ -23,23 +26,53 @@ def submit_row(context):
     return ctx
 
 
-class VolatilityManger(admin.ModelAdmin):
-    list_display = ['car', 'status', 'speed', 'condition', 'left', 'right', 'showFig', 'operate']
+class TotalManger(ExportMixin, admin.ModelAdmin):
+
+    # 限定格式为xlsx
+    def get_export_formats(self):  # 该方法是限制格式
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
+
+    # 对接资源类
+    resource_class = TotalResource
+
+    list_display = ['car', 'status', 'speed', 'condition', 'result', 'clarity_left',
+                    'clarity_right', 'clarity', 'loudness_left', 'loudness_right',
+                    'loudness', 'sharpness_left', 'sharpness_right', 'sharpness',
+                    'volatility_left', 'volatility_right', 'volatility', 'index']
     list_display_links = None
     search_fields = []
     list_filter = ('car', 'speed', 'status', 'condition')
     list_per_page = 10
     list_max_show_all = 10
 
+    selected_id = []
+
     # 重写方法屏蔽按钮
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}
         extra_context['show_save_and_add_another'] = False
         extra_context['show_save_and_continue'] = False
-        return super(VolatilityManger, self).change_view(request, object_id,
-                                                         form_url, extra_context=extra_context)
+        return super(TotalManger, self).change_view(request, object_id,
+                                                    form_url, extra_context=extra_context)
 
-    # 重写get_action方法，如果不是超级管理员，不能删除（也就是把删除按钮去除）
+    # # 重写编辑方法，将作为外键的用户选项自动填为当前登录用户
+    # def save_model(self, request, obj, form, change):
+    #     # If creating new article, associate request.user with author.
+    #     if not change:
+    #         loudness_obj = Loudness.objects.get()
+    #     super().save_model(request, obj, form, change)
+
+    # # 重写查看返回方法，超级管理员可以查看所有数据，否则只可以看到自己创建的数据
+    # def get_queryset(self, request):
+    #     qs = super().get_queryset(request)
+    #     if request.user.is_superuser:
+    #         return qs
+    #     return qs.filter(user=request.user)
+
+    # 重写get_action方法，如果不是超级管理员，不能操作
     def get_actions(self, request):
         actions = super().get_actions(request)
         if not request.user.is_superuser:
@@ -58,47 +91,41 @@ class VolatilityManger(admin.ModelAdmin):
 
     # 禁用删除
     def has_delete_permission(self, request, obj=None):
+
         return False
 
-    @admin.display(description='声品质彩图', ordering='id')
-    def showFig(self, obj):
-        if not obj.image == " ":
-            page_url = "/volatility/get_image/%d" % (obj.id)
-            image_url = (MEDIA_URL + obj.image.name)
-        else:
-            page_url = ""
-            image_url = ""
-        return format_html(
-            '<a title="点击放大" href="{}"><img alt="文件未上传" src="{}" style="width:50px;height:40px;"/></a>'.format(
-                page_url,
-                image_url))
+    # @admin.display(description='声品质彩图', ordering='id')
+    # def showFig(self, obj):
+    #     picture = '{"icon": "fas fa-user-tie","url": "/static/images/头像.jpg"}'
+    #     show_btn = f"""<button onclick='self.parent.app.openTab({picture})'
+    #                                          class='el-icon-picture el-button el-button--warning el-button--small'>查看</button>"""
+    #     return mark_safe(f"<div>{show_btn}</div>")
 
     # 定义一些操作示例
     @admin.display(description='操作', ordering='id')
     def operate(self, obj):
         # 编辑按钮
-        data1 = '{"icon": "fas fa-user-tie","url": "/admin/volatility/volatility/%d/change/"}' % (obj.id)
+        data1 = '{"icon": "fas fa-user-tie","url": "/admin/total/total/%d/change/"}' % (obj.id)
         update_btn = f"""<button onclick='self.parent.app.openTab({data1})'
-                                                 class='el-icon-edit el-button el-button--primary el-button--small'>编辑</button>"""
+                                     class='el-icon-edit el-button el-button--primary el-button--small'>编辑</button>"""
+
+        # data1 = "/admin/data/data/%d/change/" % (obj.id)
+
+        # update_btn = '<a class="el-icon-edit el-link--primary"   href="{}">编辑</a>'.format(data1)
+        # update_btn = "<button onclick='window.location.href=%s' class='el-icon-edit el-button el-button--primary el-button--small'>编辑</button>" %(data1)
 
         # 删除按钮
-        data2 = '{"icon": "fas fa-user-tie","url": "/volatility/single_delete/%d"}' % (obj.id)
-        delete_btn = f"""<button onclick='self.parent.app.openTab({data2})' 
-                                            class='el-icon-delete-solid el-button el-button--danger el-button--small'>删除</button>"""
+        data2 = '{"icon": "fas fa-user-tie","url": "/total/single_delete/%d"}' % (obj.id)
+        # data2 = "/data/single_delete/%d" % (obj.id)
+        delete_btn = f"""<button onclick='self.parent.app.openTab({data2})'
+                                class='el-icon-delete-solid el-button el-button--danger el-button--small'>删除</button>"""
+        # delete_btn = '<a class="el-icon-delete-solid el-link--danger"  href="{}">删除</a>'.format(data2)
 
         html_str = f"<div>{update_btn} {delete_btn}</div>"
         return mark_safe(html_str)
 
     # 添加按钮
-
-    actions = ['output','analyse', 'compare']
-
-    @admin.display(description='详细信息', ordering='id')
-    def detail(self, obj):
-
-        show_link = "<a href='/data/get_details/%d'>查看</a>" % (obj.id)
-
-        return mark_safe(f"{show_link}")
+    actions = ['output', 'analyse', 'compare']
 
     # 这里应该发送一个get请求给后端返回页面，然后页面快速发送ajax请求给后端同一个view（用get，post区分开）
     # 然后后端
@@ -108,15 +135,17 @@ class VolatilityManger(admin.ModelAdmin):
 
     # 按钮的点击事件
     def output(self, request):
-        return True
+        print("=====hello====")
+        return HttpResponseRedirect('/total/get_preview')
 
     # 按钮的配置
-    output.short_description = '导出'
+    output.short_description = '预览'
     output.icon = 'el-icon-download'
     output.type = 'primary'
     output.style = 'color:rainbow;'
     output.action_type = 1
     output.action_url = ''
+    output.action_url = '/total/get_preview'
 
     # 链接按钮，设置之后直接访问该链接
     # 3中打开方式
@@ -124,10 +153,9 @@ class VolatilityManger(admin.ModelAdmin):
     # 设置了action_type，不设置url，页面内将报错
     # 设置成链接类型的按钮后，custom_button方法将不会执行。
 
-    def analyse(self, request, queryset):
+    def analyse(self, request):
         print("hello")
-        selected = queryset.values_list('pk', flat=True)
-        return HttpResponseRedirect("/volatility/analyse/{}".format('.'.join(str(pk) for pk in selected)))
+        return True
 
     # analyse.layer = {
     #     # 弹出层中的输入框配置
@@ -190,8 +218,23 @@ class VolatilityManger(admin.ModelAdmin):
 
     def compare(self, request, queryset):
         # 获得被打钩的checkbox对应的对象id的列表
+
         selected = queryset.values_list('pk', flat=True)
-        return HttpResponseRedirect("/volatility/compare/{}".format('.'.join(str(pk) for pk in selected)))
+
+        # 获取对应的模型
+
+        ct = ContentType.objects.get_for_model(queryset.model)
+        print(selected)  # 选择的数据
+        print(ct.pk)  # id号
+
+        # 构造访问的url，使用GET方法，跳转到相应的页面
+        return HttpResponseRedirect('/data/get_ids?model=%s&ids=%s' % (
+
+            ct,
+
+            ','.join(str(pk) for pk in selected),
+
+        ))
 
     # dict = {}
     # url = 'http://127.0.0.1:8000/data/get_ids/'
@@ -213,4 +256,4 @@ class VolatilityManger(admin.ModelAdmin):
     # compare.action_url = '/data/get_analyse'
 
 
-admin.site.register(Volatility, VolatilityManger)
+admin.site.register(Total, TotalManger)

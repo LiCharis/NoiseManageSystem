@@ -91,7 +91,7 @@ class SharpnessManger(admin.ModelAdmin):
 
     # 添加按钮
 
-    actions = ['output', 'analyse', 'compare']
+    actions = ['output','analyse', 'compare']
 
     @admin.display(description='详细信息', ordering='id')
     def detail(self, obj):

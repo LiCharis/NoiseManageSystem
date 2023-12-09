@@ -30,6 +30,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'simpleui',
+    'import_export',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,7 +44,8 @@ INSTALLED_APPS = [
     'clarity',
     'user',
     'car',
-    'evaluation'
+    'evaluation',
+    'total'
 ]
 
 MIDDLEWARE = [
@@ -84,7 +86,6 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'ManageSystem',
         'USER': 'root',
-        'PASSWORD': 'root',
         'HOST': '127.0.0.1',
         'POST': '3306',
         'OPTIONS': {
@@ -198,6 +199,11 @@ SIMPLEUI_CONFIG = {
                     'icon': 'fa fa-tasks',
                     'url': 'evaluation/evaluation/'
                 },
+                {
+                    'name': '结果总表',
+                    'icon': 'fa fa-tasks',
+                    'url': 'total/total/'
+                },
             ]
         },
 
@@ -239,3 +245,6 @@ AUTH_USER_MODEL = 'user.User'
 SIMPLEUI_HOME_PAGE = '/ManageSystem/dashboard'
 SIMPLEUI_HOME_TITLE = '主页'
 SIMPLEUI_HOME_ICON = 'fa fa-eye'
+
+# 导入导出
+IMPORT_EXPORT_USE_TRANSACTIONS = True

@@ -1,23 +1,22 @@
 # Register your models here.
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-
-from car.models import Car
-from clarity.models import Clarity
-from loudness.models import Loudness
-from sharpness.models import Sharpness
-from volatility.models import Volatility
+from import_export.formats import base_formats
+from openpyxl import Workbook
 
 from ManageSystem.settings import MEDIA_URL
 from .models import Data
-from loudness.models import Loudness
+
 # Register your models here.
 
 from django.contrib.admin.templatetags.admin_modify import *
 from django.contrib.admin.templatetags.admin_modify import submit_row as original_submit_row
+
+from .resource import DataResource
+from import_export.admin import ImportExportModelAdmin, ExportMixin
 
 
 @register.inclusion_tag('admin/submit_line.html', takes_context=True)
@@ -30,7 +29,18 @@ def submit_row(context):
     return ctx
 
 
-class DataManger(admin.ModelAdmin):
+class DataManger(ExportMixin, admin.ModelAdmin):
+
+    # 限定格式为xlsx
+    def get_export_formats(self):  # 该方法是限制格式
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
+
+    # 对接资源类
+    resource_class = DataResource
+
     list_display = ['car', 'status', 'speed', 'condition', 'result', 'detail', 'showFig', 'operate']
     list_display_links = None
     search_fields = []
@@ -83,30 +93,6 @@ class DataManger(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
 
         return False
-
-    @admin.display(description='响度', ordering='id')
-    def loudness_left_and_right(self, obj):
-        loudness_obj = Loudness.objects.get(id=obj.loudness_id)
-
-        return "%s  |  %s" % (loudness_obj.left, loudness_obj.right)
-
-    @admin.display(description='尖锐度', ordering='id')
-    def sharpness_left_and_right(self, obj):
-        sharpness_obj = Sharpness.objects.get(id=obj.sharpness_id)
-
-        return "%s  |  %s" % (sharpness_obj.left, sharpness_obj.right)
-
-    @admin.display(description='波动度', ordering='id')
-    def volatility_left_and_right(self, obj):
-        volatility_obj = Volatility.objects.get(id=obj.volatility_id)
-
-        return "%s  |  %s" % (volatility_obj.left, volatility_obj.right)
-
-    @admin.display(description='语音清晰度', ordering='id')
-    def clarity_left_and_right(self, obj):
-        clarity_obj = Clarity.objects.get(id=obj.clarity_id)
-
-        return "%s  |  %s" % (clarity_obj.left, clarity_obj.right)
 
     @admin.display(description='声品质彩图', ordering='id')
     def showFig(self, obj):
@@ -161,12 +147,6 @@ class DataManger(admin.ModelAdmin):
 
         return mark_safe(f"{show_link}")
 
-    # 这里应该发送一个get请求给后端返回页面，然后页面快速发送ajax请求给后端同一个view（用get，post区分开）
-    # 然后后端
-
-    # detail.action_type = 1
-    # detail.action_url = '/data/get_detail/' + str(selected_id)
-
     # 按钮的点击事件
     def output(self, request):
         return True
@@ -179,6 +159,14 @@ class DataManger(admin.ModelAdmin):
     output.action_type = 1
     output.action_url = ''
 
+
+
+    # 这里应该发送一个get请求给后端返回页面，然后页面快速发送ajax请求给后端同一个view（用get，post区分开）
+    # 然后后端
+
+    # detail.action_type = 1
+    # detail.action_url = '/data/get_detail/' + str(selected_id)
+
     # 链接按钮，设置之后直接访问该链接
     # 3中打开方式
     # action_type 0=当前页内打开，1=新tab打开，2=浏览器tab打开
@@ -190,64 +178,10 @@ class DataManger(admin.ModelAdmin):
         selected = queryset.values_list('pk', flat=True)
         return HttpResponseRedirect("/data/analyse/{}".format('.'.join(str(pk) for pk in selected)))
 
-    # analyse.layer = {
-    #     # 弹出层中的输入框配置
-    #     # 这里指定对话框的标题
-    #     'title': '数据分析',
-    #     # 提示信息
-    #     'tips': '数据分析的弹出表单',
-    #     # 弹出层对话框的宽度，默认50%
-    #     'width': '95%',
-    #     # 表单中 label的宽度，对应element-ui的 label-width，默认80px
-    #     'labelWidth': "80px",
-    #     # 确认按钮显示文本
-    #     'confirm_button': '确认提交',
-    #     # 取消按钮显示文本
-    #     'cancel_button': '取消',
-    #
-    #     'url': "http://www.baidu.com",
-    #     'params': [{
-    #         'type': 'select',
-    #         'key': 'type',
-    #         'label': '选择分析参数',
-    #         'width': '200px',
-    #         # size对应elementui的size，取值为：medium  small  mini
-    #         'size': 'medium',
-    #         # value字段可以指定默认值
-    #         'value': '0',
-    #         'options': [{
-    #             'key': '0',
-    #             'label': '11'
-    #         }, {
-    #             'key': '1',
-    #             'label': '22'
-    #         }]
-    #     },
-    #         {
-    #             'type': 'select',
-    #             'key': 'type',
-    #             'label': '选择动力形式',
-    #             'width': '200px',
-    #             # size对应elementui的size，取值为：medium  small  mini
-    #             'size': 'small',
-    #             # value字段可以指定默认值
-    #             'value': '1',
-    #             'options': [{
-    #                 'key': '0',
-    #                 'label': '11'
-    #             }, {
-    #                 'key': '1',
-    #                 'label': '22'
-    #             }]
-    #         }
-    #     ]}
     analyse.short_description = '数据分析（折线图）'
     analyse.icon = 'el-icon-s-data'
     analyse.type = 'warning'
     analyse.style = 'color:rainbow;'
-
-    # analyse.action_type = 1
-    # analyse.action_url = '/data/get_analyse'
 
     def compare(self, request, queryset):
         # 获得被打钩的checkbox对应的对象id的列表

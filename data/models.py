@@ -19,7 +19,7 @@ class Data(models.Model):
     first_right = models.FloatField(verbose_name='测量次数一AA-BB内最大声压级（右侧）-SPL_R', null=True, blank=True)
     second_left = models.FloatField(verbose_name='测量次数二AA-BB内最大声压级（左侧）-SPL_L', null=True, blank=True)
     second_right = models.FloatField(verbose_name='测量次数二AA-BB内最大声压级（右侧）-SPL_R', null=True, blank=True)
-    image = models.FileField(upload_to='upload_image', default=" ")
+    image = models.FileField(upload_to='upload_image', verbose_name="图片地址", default=" ")
 
     result = models.FloatField(verbose_name='通过噪声最终结果', null=True, blank=True)
 

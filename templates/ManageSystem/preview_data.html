@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+
+
+
+
+    <h1 style="color: red;display: inline-block;margin-right: 20px">数据预览</h1>
+
+
+    <a style="font-size: 20px" href="{{ output }}">导出</a>
+
+    <table border="2">
+
+
+        <tr>
+
+            <th>ID</th>
+            <th>汽车品牌</th>
+            <th>汽车型号</th>
+            <th>速度形式</th>
+            <th>工况</th>
+            <th>荷载状态</th>
+            <th>声压级最终结果</th>
+            <th>语音清晰度左耳-%</th>
+            <th>语音清晰度右耳-%</th>
+            <th>语音清晰度-%</th>
+            <th>响度左耳-sone</th>
+            <th>响度右耳-sone</th>
+            <th>响度-sone</th>
+            <th>尖锐度左耳-acum</th>
+            <th>尖锐度右耳-acum</th>
+            <th>尖锐度-acum</th>
+            <th>波动度左耳-vacil</th>
+            <th>波动度右耳-vacil</th>
+            <th>波动度-vacil</th>
+            <th>声品质综合评价指数</th>
+        </tr>
+
+        {% for data in data_to_preview %}
+            <tr>
+                <th>{{ data.id }}</th>
+                <th>{{ data.car.brand }}</th>
+                <th>{{ data.car.model }}</th>
+                <th>{{ data.speed }}</th>
+                <th>{{ data.condition }}</th>
+                <th>{{ data.status }}</th>
+                <th>{{ data.result }}</th>
+                <th>{{ data.clarity_left }}
+                <th>{{ data.clarity_right }}</th>
+                <th>{{ data.clarity }}</th>
+                <th>{{ data.loudness_left }}</th>
+                <th>{{ data.loudness_right }}</th>
+                <th>{{ data.loudness }}</th>
+                <th>{{ data.sharpness_left }}</th>
+                <th>{{ data.sharpness_right }}</th>
+                <th>{{ data.sharpness }}</th>
+                <th>{{ data.volatility_left }}</th>
+                <th>{{ data.volatility_right }}</th>
+                <th>{{ data.volatility }}</th>
+                <th>{{ data.index }}</th>
+
+
+            </tr>
+
+
+
+        {% endfor %}
+
+    </table>
+    <div style="float: left">
+        <form method="get" action="{{ action }}">
+            <p>
+                <input type="submit" value="返回"/>
+            </p>
+
+
+        </form>
+
+    </div>
+
+
+{% endblock %}
+
+</body>
+</html>
