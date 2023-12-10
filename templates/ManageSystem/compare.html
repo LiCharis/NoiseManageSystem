@@ -7,15 +7,28 @@
     <title>实验数据对比（柱状图）</title>
 </head>
 <body>
-<div class="container">
-    <h1>{{ title }}数据对比（柱状图）</h1>
 
-</div>
+{% extends "admin/base_site.html" %}
 
-<div style="margin-left: 20%;margin-top: 10%;width: auto">
-    {{ bar_chart |safe }}
-</div>
+{% block content %}
 
+    <div class="container">
+        <h1>{{ context.title }}数据对比（柱状图）</h1>
+
+    </div>
+
+    <div style="margin-left: 20%;margin-top: 10%;width: auto">
+        {{ context.bar_chart |safe }}
+        <form method="get" action="{{ action }}">
+
+            <p>
+
+                <input type="submit" value="返回"/>
+            </p>
+        </form>
+    </div>
+
+{% endblock %}
 
 <script src="/static/js/jquery-3.3.1.min.js"></script>
 <script src="/static/js/bootstrap.min.js"></script>

@@ -138,7 +138,7 @@ class DataManger(ExportMixin, admin.ModelAdmin):
         return mark_safe(html_str)
 
     # 添加按钮
-    actions = ['output', 'analyse', 'compare']
+    actions = ['analyse', 'compare']
 
     @admin.display(description='详细信息', ordering='id')
     def detail(self, obj):

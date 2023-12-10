@@ -18,6 +18,6 @@ def dashboard(request):
                'sharpness_count': sharpness_count, 'volatility_count': volatility_count,
                'clarity_count': clarity_count}
     print("hello")
-    return render(request, 'ManageSystem/dashboard.html', context)
+    return render(request, 'ManageSystem/dashboard.html', locals())
 
 

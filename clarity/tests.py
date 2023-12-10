@@ -71,4 +71,4 @@ def compare(request, ids):
         )
 
         context = {'bar_chart': bar.render_embed(), 'flag': True}
-    return render(request, 'ManageSystem/compare.html', context)
+    return render(request, 'ManageSystem/compare.html', locals())

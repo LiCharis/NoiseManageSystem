@@ -246,7 +246,8 @@ def analyse(request, ids):
                 
                 line.add_yaxis("声压——"+i,right_temp)
     context = {'line_chart': line.render_embed(), 'flag': True}
-    return render(request, 'ManageSystem/analyse.html', context)
+    action = '/admin/data/data'
+    return render(request, 'ManageSystem/analyse.html', locals())
 
 
 
@@ -328,4 +329,5 @@ def compare(request, ids):
             print(right_temp)
             bar.add_yaxis(i, right_temp, category_gap="50%")
     context = {'bar_chart': bar.render_embed(), 'flag': True, 'title': '声压级'}
-    return render(request, 'ManageSystem/compare.html', context)
+    action = '/admin/data/data'
+    return render(request, 'ManageSystem/compare.html', locals())

@@ -222,7 +222,8 @@ def analyse(request, ids):
                 line.add_yaxis("响度右耳——"+i,right_temp)
                             
     context = {'line_chart': line.render_embed(), 'flag': True}
-    return render(request, 'ManageSystem/analyse.html', context)
+    action = '/admin/loudness/loudness'
+    return render(request, 'ManageSystem/analyse.html', locals())
 
 def compare(request, ids):
     id_list = ids.split(".")
@@ -304,4 +305,5 @@ def compare(request, ids):
             bar.add_yaxis(i+'——响度左耳', left_temp, category_gap="50%")
             bar.add_yaxis(i+'——响度右耳', right_temp, category_gap="50%")
     context = {'bar_chart': bar.render_embed(), 'flag': True, 'title': '响度'}
-    return render(request, 'ManageSystem/compare.html', context)
+    action = '/admin/loudness/loudness'
+    return render(request, 'ManageSystem/compare.html', locals())

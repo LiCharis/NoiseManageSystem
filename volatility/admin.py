@@ -4,6 +4,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
+from import_export.admin import ExportMixin
+from import_export.formats import base_formats
 
 from ManageSystem.settings import MEDIA_URL
 from .models import Volatility
@@ -11,6 +13,8 @@ from .models import Volatility
 
 from django.contrib.admin.templatetags.admin_modify import *
 from django.contrib.admin.templatetags.admin_modify import submit_row as original_submit_row
+
+from .resource import VolatilityResource
 
 
 @register.inclusion_tag('admin/submit_line.html', takes_context=True)
@@ -23,7 +27,19 @@ def submit_row(context):
     return ctx
 
 
-class VolatilityManger(admin.ModelAdmin):
+class VolatilityManger(ExportMixin, admin.ModelAdmin):
+
+    # 限定格式为xlsx
+    def get_export_formats(self):  # 该方法是限制格式
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
+
+    # 对接资源类
+
+    resource_class = VolatilityResource
+
     list_display = ['car', 'status', 'speed', 'condition', 'left', 'right', 'showFig', 'operate']
     list_display_links = None
     search_fields = []
@@ -91,7 +107,7 @@ class VolatilityManger(admin.ModelAdmin):
 
     # 添加按钮
 
-    actions = ['output','analyse', 'compare']
+    actions = ['analyse', 'compare']
 
     @admin.display(description='详细信息', ordering='id')
     def detail(self, obj):
