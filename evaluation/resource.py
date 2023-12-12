@@ -4,14 +4,16 @@ from import_export.widgets import ForeignKeyWidget
 
 from car.models import Car
 from total.models import Total
+from .models import Evaluation
 
 
-class TotalResource(resources.ModelResource):
+class EvaluationResource(resources.ModelResource):
+    field_list = []
 
     def __init__(self):
-        super(TotalResource, self).__init__()
+        super(EvaluationResource, self).__init__()
         # 获取模型的字段列表,
-        field_list = Total._meta.fields
+        field_list = Evaluation._meta.fields
         # 做成一个{字段名:中文名}的字典，作为成员变量
         self.vname_dict = {i.name: i.verbose_name for i in field_list}
         # 每一个field中包含有name和verbose_name, 直接提取转化为字典
@@ -41,18 +43,32 @@ class TotalResource(resources.ModelResource):
         widget=ForeignKeyWidget(Car, 'model'))
 
     # 在字段列表里加上这个自定义字段
+    speed = fields.Field(
+        column_name='速度形式',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'speed'))
+
+    condition = fields.Field(
+        column_name='工况',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'condition'))
+
+    status = fields.Field(
+        column_name='荷载状态',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'status'))
+
+    index = fields.Field(
+        column_name='声品质综合评价指数',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'evaluation_result'))
 
     # 此处可写方法以添加更多功能
     class Meta:
-        model = Total
+        model = Evaluation
         # fields内的模型字段会被导入导出, exclude内的会被排除在外，如果都不写，默认为模型中的全部字段都要包含。
-        fields = ['id', 'brand', 'model', 'speed', 'condition', 'status', 'clarity_left', 'clarity_right',
-                  'clarity_result',
-                  'loudness_left', 'loudness_right', 'loudness_result', 'sharpness_left', 'sharpness_right',
-                  'sharpness_result',
-                  'volatility_left',
-                  'volatility_right', 'volatility_result', 'index']
+        fields = ['id', 'brand', 'model', 'speed', 'condition', 'status', 'index']
 
         # excloud = ()
         # export_order（自定义） 选项设置导出字段的显式顺序，没在这里规定的就按默认顺序排在后面（不能只写一个）(导入不用管顺序)
-        export_order = ('id', 'brand', 'model', 'speed', 'condition')
+        export_order = ('id', 'brand', 'speed')

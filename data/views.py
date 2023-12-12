@@ -75,7 +75,7 @@ def get_details(request, id):
 
     action = '/admin/data/data'
     try:
-        obj = Data.objects.get(id=id)
+        obj = Data.objects.get(id=id).total
 
     except Exception as e:
         print(e)
@@ -146,8 +146,8 @@ def get_image(request, id):
     if request.method == 'GET':
         action = '/admin/data/data'
         try:
-            obj = Data.objects.get(id=id)
-            url = MEDIA_URL + str(obj.image)
+            obj = Data.objects.get(id=id).total
+            url = MEDIA_URL + str(obj.data_image)
             dataname = '声压级结果'
 
         except Exception as e:
@@ -166,12 +166,12 @@ def analyse(request, ids):
     speed_x_label = []
     y = {'空载':[],'半载':[],'3/4额定载荷（24T）':[],'满载':[]}
     for id in id_list:
-        data = Data.objects.get(id=id)
+        data = Data.objects.get(id=id).total
         categories.append(
             str(str(data.speed) + '/' + str(data.condition) + '/' + str(data.status) + '/' + str(
                 data.car.brand) + '/' + str(data.car.model)))
         y[str(data.status)].append(str(str(data.speed) + '/' + str(data.condition) + '/' + str(data.status) + '/' + str(
-                data.car.brand) + '/' + str(data.car.model))+'/'+str(data.result))
+                data.car.brand) + '/' + str(data.car.model))+'/'+str(data.data_result))
         flag = True
         temp = re.search( r'\d{2,}', str(data.condition), re.M|re.I).group()+'km'
         for i in speed_x_label:
@@ -179,7 +179,7 @@ def analyse(request, ids):
                 flag = False
         if flag:        
             speed_x_label.append(temp)
-        data_left.append(data.result)
+        data_left.append(data.data_result)
 
     # print(categories)
     car_type = str(set([''.join(i.split('/')[-2:]) for i in categories]))[2:-2]
@@ -246,7 +246,8 @@ def analyse(request, ids):
                 
                 line.add_yaxis("声压——"+i,right_temp)
     context = {'line_chart': line.render_embed(), 'flag': True}
-    return render(request, 'ManageSystem/analyse.html', context)
+    action = '/admin/data/data'
+    return render(request, 'ManageSystem/analyse.html', locals())
 
 
 
@@ -260,7 +261,7 @@ def compare(request, ids):
     brand_type = []
     speed_x_label = []
     for id in id_list:
-        data = Data.objects.get(id=id)
+        data = Data.objects.get(id=id).total
         temp = re.search( r'\d{2,}', str(data.condition), re.M|re.I).group()+'km'
         speed_x_label.append(temp)
         # categories.append(
@@ -268,7 +269,7 @@ def compare(request, ids):
         #         data.car.brand) + '/' + str(data.car.model)+'/'+str(data.result)))
         categories.append(
             str(str(data.speed) + '/' + temp + '/' + str(data.status) + '/' + str(
-                data.car.brand) + '/' + str(data.car.model)+'/'+str(data.result)))
+                data.car.brand) + '/' + str(data.car.model)+'/'+str(data.data_result)))
         brand_type.append(str(data.car.brand) + str(data.car.model))
         
 
@@ -328,4 +329,5 @@ def compare(request, ids):
             print(right_temp)
             bar.add_yaxis(i, right_temp, category_gap="50%")
     context = {'bar_chart': bar.render_embed(), 'flag': True, 'title': '声压级'}
-    return render(request, 'ManageSystem/compare.html', context)
+    action = '/admin/data/data'
+    return render(request, 'ManageSystem/compare.html', locals())

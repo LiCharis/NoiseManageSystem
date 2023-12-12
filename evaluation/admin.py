@@ -6,11 +6,17 @@ from django.contrib import admin
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
+from import_export.admin import ExportMixin
+from import_export.formats import base_formats
+
 from ManageSystem.settings import MEDIA_URL
+from total.models import Total
 from .models import Evaluation
 # Register your models here.
 from django.contrib.admin.templatetags.admin_modify import *
 from django.contrib.admin.templatetags.admin_modify import submit_row as original_submit_row
+
+from .resource import EvaluationResource
 
 
 @register.inclusion_tag('admin/submit_line.html', takes_context=True)
@@ -23,13 +29,54 @@ def submit_row(context):
     return ctx
 
 
-class EvaluationManger(admin.ModelAdmin):
-    list_display = ['brand', 'status', 'speed', 'condition', 'index', 'operate']
+class EvaluationManger(ExportMixin,admin.ModelAdmin):
+
+    # 限定格式为xlsx
+    def get_export_formats(self):  # 该方法是限制格式
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
+
+    # 对接资源类
+
+    resource_class = EvaluationResource
+
+    list_display = ['car', 'status', 'speed', 'condition', 'index', 'operate']
     list_display_links = None
     search_fields = []
-    list_filter = ('brand', 'speed', 'status', 'condition')
+    list_filter = ('total__car', 'total__speed', 'total__status', 'total__condition')
     list_per_page = 10
     list_max_show_all = 10
+
+    @admin.display(description='汽车', ordering='id')
+    def car(self, obj):
+        obj = Total.objects.get(id=obj.total_id)
+        return "%s%s" % (obj.car.brand, obj.car.model)
+
+    @admin.display(description='荷载状态', ordering='id')
+    def status(self, obj):
+        obj = Total.objects.get(id=obj.total_id)
+        return "%s" % (obj.status)
+
+    @admin.display(description='工况', ordering='id')
+    def condition(self, obj):
+        obj = Total.objects.get(id=obj.total_id)
+        return "%s" % (obj.condition)
+
+    @admin.display(description='速度形式', ordering='id')
+    def speed(self, obj):
+        obj = Total.objects.get(id=obj.total_id)
+        return "%s" % (obj.speed)
+
+    @admin.display(description='声品质综合评价指数', ordering='id')
+    def index(self, obj):
+        obj = Total.objects.get(id=obj.total_id)
+        return "%s" % (obj.index)
+
+
+
+
 
     # 重写方法屏蔽按钮
     def change_view(self, request, object_id, form_url='', extra_context=None):
@@ -71,7 +118,7 @@ class EvaluationManger(admin.ModelAdmin):
 
         # 删除按钮
         data2 = '{"icon": "fas fa-user-tie","url": "/evaluation/single_delete/%d"}' % (obj.id)
-        delete_btn = f"""<button onclick='self.parent.app.openTab({data2})' 
+        delete_btn = f"""<button onclick='self.parent.app.openTab({data2})'
                                         class='el-icon-delete-solid el-button el-button--danger el-button--small'>删除</button>"""
 
         html_str = f"<div>{update_btn} {delete_btn}</div>"
