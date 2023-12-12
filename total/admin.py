@@ -1,6 +1,7 @@
 # Register your models here.
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
+from django.db import connection
 from django.http import HttpResponseRedirect
 
 from django.utils.safestring import mark_safe
@@ -12,8 +13,14 @@ from django.contrib.admin.templatetags.admin_modify import submit_row as origina
 from import_export.admin import ExportMixin
 from import_export.formats import base_formats
 
+from clarity.models import Clarity
+from data.models import Data
+from evaluation.models import Evaluation
+from loudness.models import Loudness
+from sharpness.models import Sharpness
 from total.models import Total
 from total.resource import TotalResource
+from volatility.models import Volatility
 
 
 @register.inclusion_tag('admin/submit_line.html', takes_context=True)
@@ -38,10 +45,10 @@ class TotalManger(ExportMixin, admin.ModelAdmin):
     # 对接资源类
     resource_class = TotalResource
 
-    list_display = ['car', 'status', 'speed', 'condition', 'result', 'clarity_left',
-                    'clarity_right', 'clarity', 'loudness_left', 'loudness_right',
-                    'loudness', 'sharpness_left', 'sharpness_right', 'sharpness',
-                    'volatility_left', 'volatility_right', 'volatility', 'index']
+    list_display = ['car', 'status', 'speed', 'condition', 'data_result', 'clarity_left',
+                    'clarity_right', 'clarity_result', 'loudness_left', 'loudness_right',
+                    'loudness_result', 'sharpness_left', 'sharpness_right', 'sharpness_result',
+                    'volatility_left', 'volatility_right', 'volatility_result', 'index']
     list_display_links = None
     search_fields = []
     list_filter = ('car', 'speed', 'status', 'condition')
@@ -73,16 +80,16 @@ class TotalManger(ExportMixin, admin.ModelAdmin):
     #     return qs.filter(user=request.user)
 
     # 重写get_action方法，如果不是超级管理员，不能操作
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if not request.user.is_superuser:
-            if 'operate' in self.list_display:
-                self.list_display.remove('operate')
-        else:
-
-            if 'operate' not in self.list_display:
-                self.list_display.append('operate')
-        return actions
+    # def get_actions(self, request):
+    #     actions = super().get_actions(request)
+    #     if not request.user.is_superuser:
+    #         if 'operate' in self.list_display:
+    #             self.list_display.remove('operate')
+    #     else:
+    #
+    #         if 'operate' not in self.list_display:
+    #             self.list_display.append('operate')
+    #     return actions
 
     def has_add_permission(self, request):
         if request.user.is_superuser:
@@ -91,7 +98,6 @@ class TotalManger(ExportMixin, admin.ModelAdmin):
 
     # 禁用删除
     def has_delete_permission(self, request, obj=None):
-
         return False
 
     # @admin.display(description='声品质彩图', ordering='id')
@@ -126,6 +132,41 @@ class TotalManger(ExportMixin, admin.ModelAdmin):
 
     # 添加按钮
     actions = ['output', 'analyse', 'compare']
+
+    @admin.display(description='声压级结果', ordering='id')
+    def data(self, obj):
+        data_obj = Data.objects.get(id=obj.loudness)
+        return "%s  |  %s|  %s|  %s" % (data_obj.speed, data_obj.condition, data_obj.status, data_obj.result)
+
+    @admin.display(description='响度', ordering='id')
+    def loudness(self, obj):
+        loudness_obj = Loudness.objects.get(id=obj.loudness)
+
+        return "%s  |  %s|  %s" % (loudness_obj.left, loudness_obj.right, loudness_obj.result)
+
+    @admin.display(description='尖锐度', ordering='id')
+    def sharpness(self, obj):
+        sharpness_obj = Sharpness.objects.get(id=obj.sharpness)
+
+        return "%s  |  %s|  %s" % (sharpness_obj.left, sharpness_obj.right, sharpness_obj.result)
+
+    @admin.display(description='波动度', ordering='id')
+    def volatility(self, obj):
+        volatility_obj = Volatility.objects.get(id=obj.volatility)
+
+        return "%s  |  %s|  %s" % (volatility_obj.left, volatility_obj.right, volatility_obj.result)
+
+    @admin.display(description='语音清晰度', ordering='id')
+    def clarity(self, obj):
+        clarity_obj = Clarity.objects.get(id=obj.clarity)
+
+        return "%s  |  %s|  %s" % (clarity_obj.left, clarity_obj.right, clarity_obj.result)
+
+    @admin.display(description='声品质综合评价指数', ordering='id')
+    def evaluation(self, obj):
+        evaluation_obj = Evaluation.objects.get(id=obj.evaluation)
+
+        return "%s" % (evaluation_obj.index)
 
     # 这里应该发送一个get请求给后端返回页面，然后页面快速发送ajax请求给后端同一个view（用get，post区分开）
     # 然后后端

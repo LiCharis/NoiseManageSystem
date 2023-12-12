@@ -8,6 +8,7 @@ from import_export.formats import base_formats
 from openpyxl import Workbook
 
 from ManageSystem.settings import MEDIA_URL
+from total.models import Total
 from .models import Data
 
 # Register your models here.
@@ -41,14 +42,39 @@ class DataManger(ExportMixin, admin.ModelAdmin):
     # 对接资源类
     resource_class = DataResource
 
-    list_display = ['car', 'status', 'speed', 'condition', 'result', 'detail', 'showFig', 'operate']
+    list_display = ['car', 'status', 'speed', 'condition', 'data_result', 'detail', 'showFig', 'operate']
     list_display_links = None
     search_fields = []
-    list_filter = ('car', 'speed', 'status', 'condition')
+    list_filter = ('total__car', 'total__speed', 'total__status', 'total__condition')
     list_per_page = 10
     list_max_show_all = 10
 
     selected_id = []
+
+    @admin.display(description='汽车', ordering='id')
+    def car(self, obj):
+        obj = Total.objects.get(id=obj.total_id)
+        return "%s%s" % (obj.car.brand, obj.car.model)
+
+    @admin.display(description='荷载状态', ordering='id')
+    def status(self, obj):
+        obj = Total.objects.get(id=obj.total_id)
+        return "%s" % (obj.status)
+
+    @admin.display(description='工况', ordering='id')
+    def condition(self, obj):
+        obj = Total.objects.get(id=obj.total_id)
+        return "%s" % (obj.condition)
+
+    @admin.display(description='速度形式', ordering='id')
+    def speed(self, obj):
+        obj = Total.objects.get(id=obj.total_id)
+        return "%s" % (obj.speed)
+
+    @admin.display(description='声压级最终结果', ordering='id')
+    def data_result(self, obj):
+        obj = Total.objects.get(id=obj.total_id)
+        return "%s" % (obj.data_result)
 
     # 重写方法屏蔽按钮
     def change_view(self, request, object_id, form_url='', extra_context=None):
@@ -96,9 +122,9 @@ class DataManger(ExportMixin, admin.ModelAdmin):
 
     @admin.display(description='声品质彩图', ordering='id')
     def showFig(self, obj):
-        if not obj.image == " ":
+        if not obj.total.data_image == " ":
             page_url = "/data/get_image/%d" % (obj.id)
-            image_url = (MEDIA_URL + obj.image.name)
+            image_url = (MEDIA_URL + obj.total.data_image.name)
         else:
             page_url = ""
             image_url = ""
@@ -138,7 +164,7 @@ class DataManger(ExportMixin, admin.ModelAdmin):
         return mark_safe(html_str)
 
     # 添加按钮
-    actions = ['output', 'analyse', 'compare']
+    actions = ['analyse', 'compare']
 
     @admin.display(description='详细信息', ordering='id')
     def detail(self, obj):
@@ -158,8 +184,6 @@ class DataManger(ExportMixin, admin.ModelAdmin):
     output.style = 'color:rainbow;'
     output.action_type = 1
     output.action_url = ''
-
-
 
     # 这里应该发送一个get请求给后端返回页面，然后页面快速发送ajax请求给后端同一个view（用get，post区分开）
     # 然后后端

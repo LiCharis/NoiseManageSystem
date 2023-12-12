@@ -4,13 +4,18 @@ from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
+from import_export.admin import ExportMixin
+from import_export.formats import base_formats
 
 from ManageSystem.settings import MEDIA_URL
+from total.models import Total
 from .models import Volatility
 # Register your models here.
 
 from django.contrib.admin.templatetags.admin_modify import *
 from django.contrib.admin.templatetags.admin_modify import submit_row as original_submit_row
+
+from .resource import VolatilityResource
 
 
 @register.inclusion_tag('admin/submit_line.html', takes_context=True)
@@ -23,13 +28,55 @@ def submit_row(context):
     return ctx
 
 
-class VolatilityManger(admin.ModelAdmin):
+class VolatilityManger(ExportMixin, admin.ModelAdmin):
+
+    # 限定格式为xlsx
+    def get_export_formats(self):  # 该方法是限制格式
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
+
+    # 对接资源类
+
+    resource_class = VolatilityResource
+
     list_display = ['car', 'status', 'speed', 'condition', 'left', 'right', 'showFig', 'operate']
     list_display_links = None
     search_fields = []
-    list_filter = ('car', 'speed', 'status', 'condition')
+    list_filter = ('total__car', 'total__speed', 'total__status', 'total__condition')
     list_per_page = 10
     list_max_show_all = 10
+
+    @admin.display(description='汽车', ordering='id')
+    def car(self, obj):
+        obj = Total.objects.get(id=obj.total_id)
+        return "%s%s" % (obj.car.brand, obj.car.model)
+
+    @admin.display(description='荷载状态', ordering='id')
+    def status(self, obj):
+        obj = Total.objects.get(id=obj.total_id)
+        return "%s" % (obj.status)
+
+    @admin.display(description='工况', ordering='id')
+    def condition(self, obj):
+        obj = Total.objects.get(id=obj.total_id)
+        return "%s" % (obj.condition)
+
+    @admin.display(description='速度形式', ordering='id')
+    def speed(self, obj):
+        obj = Total.objects.get(id=obj.total_id)
+        return "%s" % (obj.speed)
+
+    @admin.display(description='波动度左耳-vacil%', ordering='id')
+    def left(self, obj):
+        obj = Total.objects.get(id=obj.total_id)
+        return "%s" % (obj.volatility_left)
+
+    @admin.display(description='波动度右耳-vacil', ordering='id')
+    def right(self, obj):
+        obj = Total.objects.get(id=obj.total_id)
+        return "%s" % (obj.volatility_right)
 
     # 重写方法屏蔽按钮
     def change_view(self, request, object_id, form_url='', extra_context=None):
@@ -62,9 +109,9 @@ class VolatilityManger(admin.ModelAdmin):
 
     @admin.display(description='声品质彩图', ordering='id')
     def showFig(self, obj):
-        if not obj.image == " ":
+        if not obj.total.volatility_image == " ":
             page_url = "/volatility/get_image/%d" % (obj.id)
-            image_url = (MEDIA_URL + obj.image.name)
+            image_url = (MEDIA_URL + obj.total.volatility_image.name)
         else:
             page_url = ""
             image_url = ""
@@ -83,7 +130,7 @@ class VolatilityManger(admin.ModelAdmin):
 
         # 删除按钮
         data2 = '{"icon": "fas fa-user-tie","url": "/volatility/single_delete/%d"}' % (obj.id)
-        delete_btn = f"""<button onclick='self.parent.app.openTab({data2})' 
+        delete_btn = f"""<button onclick='self.parent.app.openTab({data2})'
                                             class='el-icon-delete-solid el-button el-button--danger el-button--small'>删除</button>"""
 
         html_str = f"<div>{update_btn} {delete_btn}</div>"
@@ -91,7 +138,7 @@ class VolatilityManger(admin.ModelAdmin):
 
     # 添加按钮
 
-    actions = ['output','analyse', 'compare']
+    actions = ['analyse', 'compare']
 
     @admin.display(description='详细信息', ordering='id')
     def detail(self, obj):

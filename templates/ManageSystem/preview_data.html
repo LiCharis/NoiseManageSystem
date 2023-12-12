@@ -16,13 +16,10 @@
 
 
     <a style="font-size: 20px" href="{{ output }}">导出</a>
-
     <table border="2">
-
 
         <tr>
 
-            <th>ID</th>
             <th>汽车品牌</th>
             <th>汽车型号</th>
             <th>速度形式</th>
@@ -46,28 +43,27 @@
 
         {% for data in data_to_preview %}
             <tr>
-                <th>{{ data.id }}</th>
                 <th>{{ data.car.brand }}</th>
                 <th>{{ data.car.model }}</th>
                 <th>{{ data.speed }}</th>
                 <th>{{ data.condition }}</th>
                 <th>{{ data.status }}</th>
-                <th>{{ data.result }}</th>
-                <th>{{ data.clarity_left }}
-                <th>{{ data.clarity_right }}</th>
-                <th>{{ data.clarity }}</th>
-                <th>{{ data.loudness_left }}</th>
-                <th>{{ data.loudness_right }}</th>
-                <th>{{ data.loudness }}</th>
-                <th>{{ data.sharpness_left }}</th>
-                <th>{{ data.sharpness_right }}</th>
-                <th>{{ data.sharpness }}</th>
-                <th>{{ data.volatility_left }}</th>
-                <th>{{ data.volatility_right }}</th>
-                <th>{{ data.volatility }}</th>
+                <th style="color: {% if data.data_result == result.data_result.max %}blue{% elif data.data_result == result.data_result.min %}red{% else %}black{% endif %}">{{ data.data_result }}</th>
+                <th style="color: {% if data.clarity_left == result.clarity_left.max %}blue{% elif data.clarity_left == result.clarity_left.min %}red{% else %}black{% endif %}">{{ data.clarity_left }}
+                <th style="color: {% if data.clarity_right == result.clarity_right.max %}blue{% elif data.clarity_right == result.clarity_right.min %}red{% else %}black{% endif %}">{{ data.clarity_right }}</th>
+                <th style="color: {% if data.clarity_result == result.clarity_result.max %}blue{% elif data.clarity_result == result.clarity_result.min %}red{% else %}black{% endif %}">{{ data.clarity_result }}</th>
+                <th style="color: {% if data.loudness_left == result.loudness_left.max %}blue{% elif data.loudness_left == result.loudness_left.min %}red{% else %}black{% endif %}">{{ data.loudness_left }}</th>
+                <th style="color: {% if data.loudness_right == result.loudness_right.max %}blue{% elif data.loudness_right == result.loudness_right.min %}red{% else %}black{% endif %}">{{ data.loudness_right }}</th>
+                <th style="color: {% if data.loudness_result == result.loudness_result.max %}blue{% elif data.loudness_result == result.loudness_result.min %}red{% else %}black{% endif %}">{{ data.loudness_result }}</th>
+                <th style="color: {% if data.sharpness_left == result.sharpness_left.max %}blue{% elif data.sharpness_left == result.sharpness_left.min %}red{% else %}black{% endif %}">{{ data.sharpness_left }}</th>
+                <th style="color: {% if data.sharpness_right == result.sharpness_right.max %}blue{% elif data.sharpness_right == result.sharpness_right.min %}red{% else %}black{% endif %}">{{ data.sharpness_right }}</th>
+                <th style="color: {% if data.sharpness_result == result.sharpness_result.max %}blue{% elif data.sharpness_result == result.sharpness_result.min %}red{% else %}black{% endif %}">{{ data.sharpness_result }}</th>
+                <th style="color: {% if data.volatility_left == result.volatility_left.max %}blue{% elif data.volatility_left == result.volatility_left.min %}red{% else %}black{% endif %}">{{ data.volatility_left }}</th>
+                <th style="color: {% if data.volatility_right == result.volatility_right.max %}blue{% elif data.volatility_right == result.volatility_right.min %}red{% else %}black{% endif %}">{{ data.volatility_right }}</th>
+                <th style="color: {% if data.volatility_result == result.volatility_result.max %}blue{% elif data.volatility_result == result.volatility_result.min %}red{% else %}black{% endif %}">{{ data.volatility_result }}</th>
                 <th>{{ data.index }}</th>
 
-
+             
             </tr>
 
 

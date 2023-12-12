@@ -116,8 +116,8 @@ def get_image(request, id):
 
         action = '/admin/loudness/loudness'
         try:
-            obj = Loudness.objects.get(id=id)
-            url = MEDIA_URL + str(obj.image)
+            obj = Loudness.objects.get(id=id).total
+            url = MEDIA_URL + str(obj.loudness_image)
             dataname = '响度'
 
 
@@ -136,12 +136,12 @@ def analyse(request, ids):
     speed_x_label = []
     y = {'空载':[],'半载':[],'3/4额定载荷（24T）':[],'满载':[]}
     for id in id_list:
-        loudness = Loudness.objects.get(id=id)
+        loudness = Loudness.objects.get(id=id).total
         categories.append(
             str(str(loudness.speed) + '/' + str(loudness.condition) + '/' + str(loudness.status) + '/' + str(
                 loudness.car.brand) + '/' + str(loudness.car.model)))
         y[str(loudness.status)].append(str(str(loudness.speed) + '/' + str(loudness.condition) + '/' + str(loudness.status) + '/' + str(
-                loudness.car.brand) + '/' + str(loudness.car.model)+'/'+str(loudness.left)+'/'+str(loudness.right)))
+                loudness.car.brand) + '/' + str(loudness.car.model)+'/'+str(loudness.loudness_left)+'/'+str(loudness.loudness_right)))
         if re.search(r'km', str(loudness.condition), re.M|re.I) == None:
             flag = True
             for i in speed_x_label:
@@ -158,8 +158,8 @@ def analyse(request, ids):
             if flag:        
                 speed_x_label.append(temp)
                 
-        loudness_left.append(loudness.left)
-        loudness_right.append(loudness.right)
+        loudness_left.append(loudness.loudness_left)
+        loudness_right.append(loudness.loudness_right)
     print(speed_x_label)
     # print(categories)
     car_type = str(set([''.join(i.split('/')[-2:]) for i in categories]))[2:-2]
@@ -222,7 +222,8 @@ def analyse(request, ids):
                 line.add_yaxis("响度右耳——"+i,right_temp)
                             
     context = {'line_chart': line.render_embed(), 'flag': True}
-    return render(request, 'ManageSystem/analyse.html', context)
+    action = '/admin/loudness/loudness'
+    return render(request, 'ManageSystem/analyse.html', locals())
 
 def compare(request, ids):
     id_list = ids.split(".")
@@ -233,12 +234,12 @@ def compare(request, ids):
     brand_type = []
     speed_x_label = []
     for id in id_list:
-        loudness = Loudness.objects.get(id=id)
+        loudness = Loudness.objects.get(id=id).total
         temp = re.search( r'\d{2,}', str(loudness.condition), re.M|re.I).group()+'km'
         speed_x_label.append(temp)
         categories.append(
             str(str(loudness.speed) + '/' + temp + '/' + str(loudness.status) + '/' + str(
-                loudness.car.brand) + '/' + str(loudness.car.model)+'/'+str(loudness.left)+'/'+str(loudness.right)))
+                loudness.car.brand) + '/' + str(loudness.car.model)+'/'+str(loudness.loudness_left)+'/'+str(loudness.loudness_right)))
         brand_type.append(str(loudness.car.brand) + str(loudness.car.model))
         
         # loudness_left.append(loudness.left)
@@ -304,4 +305,5 @@ def compare(request, ids):
             bar.add_yaxis(i+'——响度左耳', left_temp, category_gap="50%")
             bar.add_yaxis(i+'——响度右耳', right_temp, category_gap="50%")
     context = {'bar_chart': bar.render_embed(), 'flag': True, 'title': '响度'}
-    return render(request, 'ManageSystem/compare.html', context)
+    action = '/admin/loudness/loudness'
+    return render(request, 'ManageSystem/compare.html', locals())

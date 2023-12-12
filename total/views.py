@@ -1,3 +1,4 @@
+from django.db.models import Max, Min
 from django.shortcuts import render
 
 # Create your views here.
@@ -69,11 +70,39 @@ def delete_true_view(request, duty_id):
 #
 
 def get_preview(request):
-
     action = '/admin/total/total'
     output = '/admin/total/total/export/?'
+    total_fields = ['data_result', 'clarity_left',
+                    'clarity_right', 'clarity_result', 'loudness_left', 'loudness_right',
+                    'loudness_result', 'sharpness_left', 'sharpness_right', 'sharpness_result',
+                    'volatility_left', 'volatility_right', 'volatility_result', 'index']
+    result = {}
     try:
         data_to_preview = Total.objects.all()  # 获取要预览的数据
+
+        for field in total_fields:
+            max_value = Total.objects.aggregate(Max(field))
+            min_value = Total.objects.aggregate(Min(field))
+            result[field] = {
+                'max': max_value[f'{field}__max'],
+                'min': min_value[f'{field}__min'],
+            }
+        #
+        # # 遍历查询集合并修改记录
+        # i = 0
+        # for data in data_to_preview:
+        #     for field, values in result.items():
+        #         temp = getattr(data, field)
+        #         if getattr(data, field) == values['max']:
+        #             setattr(data, "color", 'blue')
+        #
+        #         elif getattr(data, field) == values['min']:
+        #             setattr(data, "color", 'red')
+        #         # else:
+        #         #     setattr(data, "color", 'black')
+        #         print(data.color)
+
+
 
     except Exception as e:
         print(e)
@@ -168,8 +197,9 @@ def analyse(request, ids):
         categories.append(
             str(str(totalData.speed) + '/' + str(totalData.condition) + '/' + str(totalData.status) + '/' + str(
                 totalData.car.brand) + '/' + str(totalData.car.model)))
-        y[str(totalData.status)].append(str(str(totalData.speed) + '/' + str(totalData.condition) + '/' + str(totalData.status) + '/' + str(
-            totalData.car.brand) + '/' + str(totalData.car.model)) + '/' + str(totalData.result))
+        y[str(totalData.status)].append(
+            str(str(totalData.speed) + '/' + str(totalData.condition) + '/' + str(totalData.status) + '/' + str(
+                totalData.car.brand) + '/' + str(totalData.car.model)) + '/' + str(totalData.result))
         flag = True
         temp = re.search(r'\d{2,}', str(totalData.condition), re.M | re.I).group() + 'km'
         for i in speed_x_label:
@@ -245,7 +275,7 @@ def analyse(request, ids):
 
                 line.add_yaxis("声压——" + i, right_temp)
     context = {'line_chart': line.render_embed(), 'flag': True}
-    return render(request, 'ManageSystem/analyse.html', context)
+    return render(request, 'ManageSystem/analyse.html', locals())
 
 
 def compare(request, ids):
@@ -325,4 +355,4 @@ def compare(request, ids):
             print(right_temp)
             bar.add_yaxis(i, right_temp, category_gap="50%")
     context = {'bar_chart': bar.render_embed(), 'flag': True, 'title': '声压级'}
-    return render(request, 'ManageSystem/compare.html', context)
+    return render(request, 'ManageSystem/compare.html', locals())

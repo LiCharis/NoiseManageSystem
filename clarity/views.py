@@ -4,7 +4,7 @@ from django.shortcuts import render
 
 from ManageSystem.settings import MEDIA_URL
 from data.models import Data
-from .models import Clarity
+from .models import Total, Clarity
 import re
 from pyecharts import options as opts
 from pyecharts.charts import Bar, Line
@@ -56,7 +56,7 @@ def get_ids(request):
         print(ids)
         print(model)
         id_list = ids.split(",")
-        request.session['clarity_ids'] = id_list
+        request.session['total_ids'] = id_list
         # 先获取到所选中的用户id
         print("先获取到所选中的用户id", id_list)
 
@@ -78,22 +78,23 @@ def get_fields(request):
     if request.method == 'POST':
         json_str = request.body
         json_dict = json.loads(json_str)
-        request.session['clarity_fields'] = json_dict
-        print(request.session.get('clarity_ids'))
-        print(request.session.get('clarity_fields'))
+        request.session['total_fields'] = json_dict
+        print(request.session.get('total_ids'))
+        print(request.session.get('total_fields'))
         ids = []
 
-        for i in request.session['clarity_ids']:
-            ids.append(int(i))
+        for i in request.session['total_ids']:
+            total_id = Clarity.objects.get(id=i).total.id
+            ids.append(int(total_id))
 
         info = []
 
-        datas = Clarity.objects.filter(id__in=ids)
+        datas = Total.objects.filter(id__in=ids)
         print(datas)
 
         for obj in datas:
             fields = {"id": obj.id}
-            for k, v in request.session.get('clarity_fields').items():
+            for k, v in request.session.get('total_fields').items():
                 fields.update({v: getattr(obj, v)})
 
             info.append(fields)
@@ -112,14 +113,15 @@ def get_image(request, id):
     if request.method == 'GET':
         action = '/admin/clarity/clarity'
         try:
-            obj = Clarity.objects.get(id=id)
-            url = MEDIA_URL + str(obj.image)
+            obj = Clarity.objects.get(id=id).total
+            url = MEDIA_URL + str(obj.clarity_image)
             dataname = '语言清晰度'
 
         except Exception as e:
             print(e)
 
         return render(request, 'ManageSystem/showImage.html', locals())
+
 
 def analyse(request, ids):
     print(ids)
@@ -129,23 +131,24 @@ def analyse(request, ids):
     clarity_left = []
     clarity_right = []
     speed_x_label = []
-    y = {'空载':[],'半载':[],'3/4额定载荷（24T）':[],'满载':[]}
+    y = {'空载': [], '半载': [], '3/4额定载荷（24T）': [], '满载': []}
     for id in id_list:
-        clarity = Clarity.objects.get(id=id)
+        total = Clarity.objects.get(id=id).total
         categories.append(
-            str(str(clarity.speed) + '/' + str(clarity.condition) + '/' + str(clarity.status) + '/' + str(
-                clarity.car.brand) + '/' + str(clarity.car.model)))
-        y[str(clarity.status)].append(str(str(clarity.speed) + '/' + str(clarity.condition) + '/' + str(clarity.status) + '/' + str(
-                clarity.car.brand) + '/' + str(clarity.car.model))+'/'+str(clarity.left)+'/'+str(clarity.right))
+            str(str(total.speed) + '/' + str(total.condition) + '/' + str(total.status) + '/' + str(
+                total.car.brand) + '/' + str(total.car.model)))
+        y[str(total.status)].append(
+            str(str(total.speed) + '/' + str(total.condition) + '/' + str(total.status) + '/' + str(
+                total.car.brand) + '/' + str(total.car.model)) + '/' + str(total.clarity_left) + '/' + str(total.clarity_right))
         flag = True
-        temp = re.search( r'\d{2,}', str(clarity.condition), re.M|re.I).group()+'km'
+        temp = re.search(r'\d{2,}', str(total.condition), re.M | re.I).group() + 'km'
         for i in speed_x_label:
             if temp == i:
                 flag = False
-        if flag:        
+        if flag:
             speed_x_label.append(temp)
-        clarity_left.append(clarity.left)
-        clarity_right.append(clarity.right)
+        clarity_left.append(total.clarity_left)
+        clarity_right.append(total.clarity_right)
 
     # print(categories)
     car_type = str(set([''.join(i.split('/')[-2:]) for i in categories]))[2:-2]
@@ -161,14 +164,14 @@ def analyse(request, ids):
     print(clarity_right)
     line = (
         Line()
-        .add_xaxis(speed_x_label)
-        # .add_yaxis("语言清晰度左耳", clarity_left)
-        # .add_yaxis("语言清晰度右耳", clarity_right)
-        # .reversal_axis()
-        .set_global_opts(
-            title_opts=opts.TitleOpts(title="{} {} {} {}".format(car_type,speed_type,data_type,graph_type),
-                pos_top="5%",
-                pos_left="0%",),
+            .add_xaxis(speed_x_label)
+            # .add_yaxis("语言清晰度左耳", total_left)
+            # .add_yaxis("语言清晰度右耳", total_right)
+            # .reversal_axis()
+            .set_global_opts(
+            title_opts=opts.TitleOpts(title="{} {} {} {}".format(car_type, speed_type, data_type, graph_type),
+                                      pos_top="5%",
+                                      pos_left="0%", ),
             # yaxis_opts=opts.AxisOpts(
             #     name="",
             #     axislabel_opts=opts.LabelOpts(formatter="{value}"),  # 使用自定义格式化函数
@@ -188,22 +191,23 @@ def analyse(request, ids):
     #     else:
     #         line.add_yaxis("语言清晰度左耳——"+i,[j.split('/')[-2] for j in y[i]])
     #         line.add_yaxis("语言清晰度右耳——"+i,[j.split('/')[-1] for j in y[i]])
-    for i in ['空载','半载','3/4额定载荷（24T）','满载']:
-        if len(y[i])==0:
+    for i in ['空载', '半载', '3/4额定载荷（24T）', '满载']:
+        if len(y[i]) == 0:
             continue
         else:
             if len(speed_x_label) == len(y[i]):
-                line.add_yaxis("语言清晰度左耳——"+i,[j.split('/')[-2] for j in y[i]])
-                line.add_yaxis("语言清晰度右耳——"+i,[j.split('/')[-1] for j in y[i]])
-            else:      
+                line.add_yaxis("语言清晰度左耳——" + i, [j.split('/')[-2] for j in y[i]])
+                line.add_yaxis("语言清晰度右耳——" + i, [j.split('/')[-1] for j in y[i]])
+            else:
                 left_temp = []
-                right_temp = []         
+                right_temp = []
                 index4y = 0
                 index4x = 0
-                while index4y<len(y[i]):
+                while index4y < len(y[i]):
                     temp = y[i][index4y].split('/')
-                    while index4x<len(speed_x_label):
-                        if temp[1] == speed_x_label[index4x] or speed_x_label[index4x] == re.search(r'\d{2,}', temp[1], re.M|re.I).group()+'km':
+                    while index4x < len(speed_x_label):
+                        if temp[1] == speed_x_label[index4x] or speed_x_label[index4x] == re.search(r'\d{2,}', temp[1],
+                                                                                                    re.M | re.I).group() + 'km':
                             left_temp.append(temp[-2])
                             right_temp.append(temp[-1])
                             index4x += 1
@@ -213,11 +217,13 @@ def analyse(request, ids):
                             right_temp.append(0)
                             index4x += 1
                     index4y += 1
-                
-                line.add_yaxis("语言清晰度左耳——"+i,left_temp)
-                line.add_yaxis("语言清晰度右耳——"+i,right_temp)
+
+                line.add_yaxis("语言清晰度左耳——" + i, left_temp)
+                line.add_yaxis("语言清晰度右耳——" + i, right_temp)
     context = {'line_chart': line.render_embed(), 'flag': True}
-    return render(request, 'ManageSystem/analyse.html', context)
+    action = '/admin/clarity/clarity'
+    return render(request, 'ManageSystem/analyse.html', locals())
+
 
 def compare(request, ids):
     id_list = ids.split(".")
@@ -228,28 +234,28 @@ def compare(request, ids):
     brand_type = []
     speed_x_label = []
     for id in id_list:
-        clarity = Clarity.objects.get(id=id)
-        temp = re.search( r'\d{2,}', str(clarity.condition), re.M|re.I).group()+'km'
+        total = Clarity.objects.get(id=id).total
+        temp = re.search(r'\d{2,}', str(total.condition), re.M | re.I).group() + 'km'
         speed_x_label.append(temp)
         categories.append(
-            str(str(clarity.speed) + '/' + temp + '/' + str(clarity.status) + '/' + str(
-                clarity.car.brand) + '/' + str(clarity.car.model)+'/'+str(clarity.left)+'/'+str(clarity.right)))
-        brand_type.append(str(clarity.car.brand) + str(clarity.car.model))
-        
-        # clarity_left.append(clarity.left)
-        # clarity_right.append(clarity.right)
+            str(str(total.speed) + '/' + temp + '/' + str(total.status) + '/' + str(
+                total.car.brand) + '/' + str(total.car.model) + '/' + str(total.clarity_left) + '/' + str(total.clarity_right)))
+        brand_type.append(str(total.car.brand) + str(total.car.model))
+
+        # total_left.append(total.left)
+        # total_right.append(total.right)
     speed_x_label = list(set(speed_x_label))
     sorted(speed_x_label)
     speed_x_label = speed_x_label[::-1]
     print(categories)
-    brand_type = list(set(brand_type)) # 品牌去重
+    brand_type = list(set(brand_type))  # 品牌去重
     y = {}
     for i in brand_type:
         y[i] = []
     for i in categories:
         temp = i.split('/')
-        brand_temp = temp[-4]+temp[-3]
-        y[brand_temp].append([temp[1],temp[-2],temp[-1]])
+        brand_temp = temp[-4] + temp[-3]
+        y[brand_temp].append([temp[1], temp[-2], temp[-1]])
     print(y)
     print(speed_x_label)
     # 假设categories、sound_pressure_list等变量已定义
@@ -259,11 +265,11 @@ def compare(request, ids):
     graph_type = '柱状图对比'
     bar = (
         Bar()
-        .add_xaxis(speed_x_label)
-        # .add_yaxis("语言清晰度左耳", clarity_left)
-        # .add_yaxis("语言清晰度右耳", clarity_right)
-        .reversal_axis()
-        .set_global_opts(
+            .add_xaxis(speed_x_label)
+            # .add_yaxis("语言清晰度左耳", total_left)
+            # .add_yaxis("语言清晰度右耳", total_right)
+            .reversal_axis()
+            .set_global_opts(
             yaxis_opts=opts.AxisOpts(
                 name="速度",
                 axislabel_opts=opts.LabelOpts(formatter="{value}", interval=0),  # 使用自定义格式化函数
@@ -271,15 +277,15 @@ def compare(request, ids):
             xaxis_opts=opts.AxisOpts(
                 name="数值",
             ),
-            title_opts=opts.TitleOpts(title="{} {} {}".format(speed_type,data_type,graph_type),
-            pos_top="0%",
-            pos_left="0%")
+            title_opts=opts.TitleOpts(title="{} {} {}".format(speed_type, data_type, graph_type),
+                                      pos_top="0%",
+                                      pos_left="0%")
         )
     )
     for i in y.keys():
-        if len(y[i])==len(speed_x_label):
-            bar.add_yaxis(i+'——语言清晰度左耳', [float(j[1]) for j in y[i]], category_gap="50%")
-            bar.add_yaxis(i+'——语言清晰度右耳', [float(j[2]) for j in y[i]], category_gap="50%")
+        if len(y[i]) == len(speed_x_label):
+            bar.add_yaxis(i + '——语言清晰度左耳', [float(j[1]) for j in y[i]], category_gap="50%")
+            bar.add_yaxis(i + '——语言清晰度右耳', [float(j[2]) for j in y[i]], category_gap="50%")
             continue
         else:
             left_temp = []
@@ -290,13 +296,14 @@ def compare(request, ids):
                     if k[0] == j:
                         left_temp.append(float(k[1]))
                         right_temp.append(float(k[2]))
-                        temp_flag=False
+                        temp_flag = False
                         break
                 if temp_flag:
                     right_temp.append(0)
-            print(left_temp)            
+            print(left_temp)
             print(right_temp)
-            bar.add_yaxis(i+'——语言清晰度左耳', left_temp, category_gap="50%")
-            bar.add_yaxis(i+'——语言清晰度右耳', right_temp, category_gap="50%")
+            bar.add_yaxis(i + '——语言清晰度左耳', left_temp, category_gap="50%")
+            bar.add_yaxis(i + '——语言清晰度右耳', right_temp, category_gap="50%")
     context = {'bar_chart': bar.render_embed(), 'flag': True, 'title': '语言清晰度'}
-    return render(request, 'ManageSystem/compare.html', context)
+    action = '/admin/clarity/clarity'
+    return render(request, 'ManageSystem/compare.html', locals())
