@@ -224,7 +224,6 @@ def analyse(request, ids):
     action = '/admin/clarity/clarity'
     return render(request, 'ManageSystem/analyse.html', locals())
 
-
 def compare(request, ids):
     id_list = ids.split(".")
     categories = []
