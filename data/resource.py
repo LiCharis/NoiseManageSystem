@@ -1,46 +1,48 @@
+import tablib
+from django.db import models
+from django.db.models.fields.files import FieldFile, FileField
 from import_export import resources, fields
-from import_export.formats import base_formats
 from import_export.widgets import ForeignKeyWidget
-
+from import_export.widgets import Widget
 from car.models import Car
 from data.models import Data
 from total.models import Total
 
 
 class DataResource(resources.ModelResource):
-    field_list = []
 
-    def __init__(self):
-        super(DataResource, self).__init__()
-        # 获取模型的字段列表,
-        field_list = Data._meta.fields
-        # 做成一个{字段名:中文名}的字典，作为成员变量
-        self.vname_dict = {i.name: i.verbose_name for i in field_list}
-        # 每一个field中包含有name和verbose_name, 直接提取转化为字典
-        # 如果导入和导出的表头都需要为中文，只重写get_fields即可
+    def export(self, queryset=None, *args, **kwargs):
+        """
+        Exports a resource.
+        """
+        if queryset is None:
+            queryset = self.get_queryset()
 
-    def get_fields(self, **kwargs):
-        fields = super().get_fields(**kwargs)
-        for field in fields:
-            field_name = self.get_field_name(field)
-            # 自定义导出字段里可能有关联关系，但vname_dict肯定没有双下划线，所以必须处理
-            if field_name.find("__") > 0:
-                # 如果是关联关系的，只取字段名，不找关联，因为关联内容不在vname_dict里
-                field_name = field_name.split("__")[0]
-            # 如果此字段有verbose_name，就用
-            if field_name in self.vname_dict.keys():
-                field.column_name = self.vname_dict[field_name]
-        return fields
+        headers = self.get_export_headers()
+        data = tablib.Dataset(headers=headers)
+
+        for obj in queryset:
+            # 获取将要导出的源数据，这里export_resource返回的是列表，便于更改。替换到外键的值
+            res = self.export_resource(obj)
+            """
+            这里是关键，因为本模型没有car属性，因此只能手动写入
+            同时因为图片类型的数据会报类型不匹配的问题，这里也得手动写入
+            """
+            res[headers.index('品牌')] = Total.objects.get(id=obj.total.id).car.brand
+            res[headers.index('型号')] = Total.objects.get(id=obj.total.id).car.model
+            res[headers.index('图片地址')] = Total.objects.get(id=obj.total.id).data_image.path
+            data.append(res)
+        self.after_export(queryset, data, *args, **kwargs)
+
+        return data
 
     brand = fields.Field(
         column_name='品牌',
-        attribute='car',
-        widget=ForeignKeyWidget(Car, 'brand'))
+        attribute='brand')
 
     model = fields.Field(
         column_name='型号',
-        attribute='car',
-        widget=ForeignKeyWidget(Car, 'model'))
+        attribute='model')
 
     speed = fields.Field(
         column_name='速度形式',
@@ -80,18 +82,17 @@ class DataResource(resources.ModelResource):
     image = fields.Field(
         column_name='图片地址',
         attribute='total',
-        widget=ForeignKeyWidget(Total, 'data_image'))
+    )
 
     result = fields.Field(
         column_name='声压级最终结果',
         attribute='total',
         widget=ForeignKeyWidget(Total, 'data_result'))
 
-
-
     # 在字段列表里加上这个自定义字段
 
     # 此处可写方法以添加更多功能
+
     class Meta:
         model = Data
         # fields内的模型字段会被导入导出, exclude内的会被排除在外，如果都不写，默认为模型中的全部字段都要包含。

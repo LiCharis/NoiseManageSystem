@@ -4,7 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from import_export.admin import ExportMixin
+from import_export.admin import ExportMixin, ExportActionModelAdmin
 from import_export.formats import base_formats
 
 from ManageSystem.settings import MEDIA_URL
@@ -28,14 +28,14 @@ def submit_row(context):
     return ctx
 
 
-class LoudnessManger(ExportMixin,admin.ModelAdmin):
+class LoudnessManger(ExportActionModelAdmin, admin.ModelAdmin):
 
-    # 限定格式为xlsx
-    def get_export_formats(self):  # 该方法是限制格式
-        formats = (
-            base_formats.XLSX,
-        )
-        return [f for f in formats if f().can_export()]
+    # # 限定格式为xlsx
+    # def get_export_formats(self):  # 该方法是限制格式
+    #     formats = (
+    #         base_formats.XLSX,
+    #     )
+    #     return [f for f in formats if f().can_export()]
     # 对接资源类
 
     resource_class = LoudnessResource

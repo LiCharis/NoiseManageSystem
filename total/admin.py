@@ -10,7 +10,7 @@ from django.utils.safestring import mark_safe
 
 from django.contrib.admin.templatetags.admin_modify import *
 from django.contrib.admin.templatetags.admin_modify import submit_row as original_submit_row
-from import_export.admin import ExportMixin
+from import_export.admin import ExportMixin, ExportActionModelAdmin
 from import_export.formats import base_formats
 
 from clarity.models import Clarity
@@ -33,14 +33,14 @@ def submit_row(context):
     return ctx
 
 
-class TotalManger(ExportMixin, admin.ModelAdmin):
+class TotalManger(ExportActionModelAdmin, admin.ModelAdmin):
 
-    # 限定格式为xlsx
-    def get_export_formats(self):  # 该方法是限制格式
-        formats = (
-            base_formats.XLSX,
-        )
-        return [f for f in formats if f().can_export()]
+    # # 限定格式为xlsx
+    # def get_export_formats(self):  # 该方法是限制格式
+    #     formats = (
+    #         base_formats.XLSX,
+    #     )
+    #     return [f for f in formats if f().can_export()]
 
     # 对接资源类
     resource_class = TotalResource
@@ -131,7 +131,7 @@ class TotalManger(ExportMixin, admin.ModelAdmin):
         return mark_safe(html_str)
 
     # 添加按钮
-    actions = ['output', 'analyse', 'compare']
+    actions = ['preview']
 
     @admin.display(description='声压级结果', ordering='id')
     def data(self, obj):
@@ -175,18 +175,18 @@ class TotalManger(ExportMixin, admin.ModelAdmin):
     # detail.action_url = '/data/get_detail/' + str(selected_id)
 
     # 按钮的点击事件
-    def output(self, request):
+    def preview(self, request):
         print("=====hello====")
         return HttpResponseRedirect('/total/get_preview')
 
     # 按钮的配置
-    output.short_description = '预览'
-    output.icon = 'el-icon-download'
-    output.type = 'primary'
-    output.style = 'color:rainbow;'
-    output.action_type = 1
-    output.action_url = ''
-    output.action_url = '/total/get_preview'
+    preview.short_description = '预览'
+    preview.icon = 'el-icon-download'
+    preview.type = 'primary'
+    preview.style = 'color:rainbow;'
+    preview.action_type = 1
+    preview.action_url = ''
+    preview.action_url = '/total/get_preview'
 
     # 链接按钮，设置之后直接访问该链接
     # 3中打开方式

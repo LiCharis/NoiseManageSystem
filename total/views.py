@@ -8,6 +8,7 @@ from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
 
 from car.models import Car
+from data.models import Data
 from .models import Total
 
 from ManageSystem.settings import MEDIA_URL
@@ -173,7 +174,7 @@ def get_image(request, id):
     if request.method == 'GET':
         action = '/admin/total/total'
         try:
-            obj = Total.objects.get(id=id)
+            obj = Data.objects.get(id=id).total
             url = MEDIA_URL + str(obj.image)
             totalDataname = '声压级结果'
 

@@ -1,3 +1,4 @@
+tablib
 django
 pyecharts
 pillow

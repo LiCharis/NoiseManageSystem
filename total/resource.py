@@ -1,3 +1,4 @@
+import tablib
 from import_export import resources, fields
 from import_export.formats import base_formats
 from import_export.widgets import ForeignKeyWidget
@@ -30,15 +31,35 @@ class TotalResource(resources.ModelResource):
                 field.column_name = self.vname_dict[field_name]
         return fields
 
+    def export(self, queryset=None, *args, **kwargs):
+        """
+        Exports a resource.
+        """
+        if queryset is None:
+            queryset = self.get_queryset()
+
+        headers = self.get_export_headers()
+        data = tablib.Dataset(headers=headers)
+
+        for obj in queryset:
+            # 获取将要导出的源数据，这里export_resource返回的是列表，便于更改。替换到外键的值
+            res = self.export_resource(obj)
+            data.append(res)
+        self.after_export(queryset, data, *args, **kwargs)
+
+        return data
+
     brand = fields.Field(
         column_name='品牌',
         attribute='car',
-        widget=ForeignKeyWidget(Car, 'brand'))
+        widget=ForeignKeyWidget(Car, "brand")
+    )
 
     model = fields.Field(
         column_name='型号',
         attribute='car',
-        widget=ForeignKeyWidget(Car, 'model'))
+        widget=ForeignKeyWidget(Car, "model")
+    )
 
     # 在字段列表里加上这个自定义字段
 

@@ -15,7 +15,6 @@ from pyecharts import options as opts
 from pyecharts.charts import Bar, Line
 
 
-
 def delete_true_view(request, duty_id):
     print(request.path)
     if not duty_id:
@@ -164,20 +163,20 @@ def analyse(request, ids):
     data_left = []
     data_right = []
     speed_x_label = []
-    y = {'空载':[],'半载':[],'3/4额定载荷（24T）':[],'满载':[]}
+    y = {'空载': [], '半载': [], '3/4额定载荷（24T）': [], '满载': []}
     for id in id_list:
         data = Data.objects.get(id=id).total
         categories.append(
             str(str(data.speed) + '/' + str(data.condition) + '/' + str(data.status) + '/' + str(
                 data.car.brand) + '/' + str(data.car.model)))
         y[str(data.status)].append(str(str(data.speed) + '/' + str(data.condition) + '/' + str(data.status) + '/' + str(
-                data.car.brand) + '/' + str(data.car.model))+'/'+str(data.data_result))
+            data.car.brand) + '/' + str(data.car.model)) + '/' + str(data.data_result))
         flag = True
-        temp = re.search( r'\d{2,}', str(data.condition), re.M|re.I).group()+'km'
+        temp = re.search(r'\d{2,}', str(data.condition), re.M | re.I).group() + 'km'
         for i in speed_x_label:
             if temp == i:
                 flag = False
-        if flag:        
+        if flag:
             speed_x_label.append(temp)
         data_left.append(data.data_result)
 
@@ -195,14 +194,14 @@ def analyse(request, ids):
     print(data_right)
     line = (
         Line()
-        .add_xaxis(speed_x_label)
-        # .add_yaxis("波动度左耳", data_left)
-        # .add_yaxis("波动度右耳", data_right)
-        # .reversal_axis()
-        .set_global_opts(
-            title_opts=opts.TitleOpts(title="{} {} {} {}".format(car_type,speed_type,data_type,graph_type),
-                pos_top="5%",
-                pos_left="0%",),
+            .add_xaxis(speed_x_label)
+            # .add_yaxis("波动度左耳", data_left)
+            # .add_yaxis("波动度右耳", data_right)
+            # .reversal_axis()
+            .set_global_opts(
+            title_opts=opts.TitleOpts(title="{} {} {} {}".format(car_type, speed_type, data_type, graph_type),
+                                      pos_top="5%",
+                                      pos_left="0%", ),
             # yaxis_opts=opts.AxisOpts(
             #     name="",
             #     axislabel_opts=opts.LabelOpts(formatter="{value}"),  # 使用自定义格式化函数
@@ -222,20 +221,21 @@ def analyse(request, ids):
     #     else:
     #         line.add_yaxis("波动度左耳——"+i,[j.split('/')[-2] for j in y[i]])
     #         line.add_yaxis("波动度右耳——"+i,[j.split('/')[-1] for j in y[i]])
-    for i in ['空载','半载','3/4额定载荷（24T）','满载']:
-        if len(y[i])==0:
+    for i in ['空载', '半载', '3/4额定载荷（24T）', '满载']:
+        if len(y[i]) == 0:
             continue
         else:
             if len(speed_x_label) == len(y[i]):
-                line.add_yaxis("声压——"+i,[j.split('/')[-1] for j in y[i]])
-            else:      
-                right_temp = []         
+                line.add_yaxis("声压——" + i, [j.split('/')[-1] for j in y[i]])
+            else:
+                right_temp = []
                 index4y = 0
                 index4x = 0
-                while index4y<len(y[i]):
+                while index4y < len(y[i]):
                     temp = y[i][index4y].split('/')
-                    while index4x<len(speed_x_label):
-                        if temp[1] == speed_x_label[index4x] or speed_x_label[index4x] == re.search(r'\d{2,}', temp[1], re.M|re.I).group()+'km':
+                    while index4x < len(speed_x_label):
+                        if temp[1] == speed_x_label[index4x] or speed_x_label[index4x] == re.search(r'\d{2,}', temp[1],
+                                                                                                    re.M | re.I).group() + 'km':
                             right_temp.append(temp[-1])
                             index4x += 1
                             break
@@ -243,12 +243,11 @@ def analyse(request, ids):
                             right_temp.append(0)
                             index4x += 1
                     index4y += 1
-                
-                line.add_yaxis("声压——"+i,right_temp)
+
+                line.add_yaxis("声压——" + i, right_temp)
     context = {'line_chart': line.render_embed(), 'flag': True}
     action = '/admin/data/data'
     return render(request, 'ManageSystem/analyse.html', locals())
-
 
 
 def compare(request, ids):
@@ -262,29 +261,28 @@ def compare(request, ids):
     speed_x_label = []
     for id in id_list:
         data = Data.objects.get(id=id).total
-        temp = re.search( r'\d{2,}', str(data.condition), re.M|re.I).group()+'km'
+        temp = re.search(r'\d{2,}', str(data.condition), re.M | re.I).group() + 'km'
         speed_x_label.append(temp)
         # categories.append(
         #     str(str(data.speed) + '/' + str(data.condition) + '/' + str(data.status) + '/' + str(
         #         data.car.brand) + '/' + str(data.car.model)+'/'+str(data.result)))
         categories.append(
             str(str(data.speed) + '/' + temp + '/' + str(data.status) + '/' + str(
-                data.car.brand) + '/' + str(data.car.model)+'/'+str(data.data_result)))
+                data.car.brand) + '/' + str(data.car.model) + '/' + str(data.data_result)))
         brand_type.append(str(data.car.brand) + str(data.car.model))
-        
 
     speed_x_label = list(set(speed_x_label))
     sorted(speed_x_label)
     speed_x_label = speed_x_label[::-1]
     print(categories)
-    brand_type = list(set(brand_type)) # 品牌去重
+    brand_type = list(set(brand_type))  # 品牌去重
     y = {}
     for i in brand_type:
         y[i] = []
     for i in categories:
         temp = i.split('/')
-        brand_temp = temp[-3]+temp[-2]
-        y[brand_temp].append([temp[1],temp[-1]])
+        brand_temp = temp[-3] + temp[-2]
+        y[brand_temp].append([temp[1], temp[-1]])
     print(y)
     print(speed_x_label)
     # 假设categories、sound_pressure_list等变量已定义
@@ -294,10 +292,10 @@ def compare(request, ids):
     graph_type = '柱状图对比'
     bar = (
         Bar()
-        .add_xaxis(speed_x_label)
-        # .add_yaxis("声压", sound_pressure_list, category_gap="50%")
-        .reversal_axis()
-        .set_global_opts(
+            .add_xaxis(speed_x_label)
+            # .add_yaxis("声压", sound_pressure_list, category_gap="50%")
+            .reversal_axis()
+            .set_global_opts(
             yaxis_opts=opts.AxisOpts(
                 name="速度",
                 axislabel_opts=opts.LabelOpts(formatter="{value}"),  # 使用自定义格式化函数
@@ -305,13 +303,13 @@ def compare(request, ids):
             xaxis_opts=opts.AxisOpts(
                 name="数值",
             ),
-            title_opts=opts.TitleOpts(title="{} {} {}".format(speed_type,data_type,graph_type),
-            pos_top="0%",
-            pos_left="0%")
+            title_opts=opts.TitleOpts(title="{} {} {}".format(speed_type, data_type, graph_type),
+                                      pos_top="0%",
+                                      pos_left="0%")
         )
     )
     for i in y.keys():
-        if len(y[i])==len(speed_x_label):
+        if len(y[i]) == len(speed_x_label):
             bar.add_yaxis(i, [float(j[1]) for j in y[i]], category_gap="50%")
             continue
         else:
@@ -321,11 +319,11 @@ def compare(request, ids):
                 for k in y[i]:
                     if k[0] == j:
                         right_temp.append(float(k[1]))
-                        temp_flag=False
+                        temp_flag = False
                         break
                 if temp_flag:
                     right_temp.append(0)
-                        
+
             print(right_temp)
             bar.add_yaxis(i, right_temp, category_gap="50%")
     context = {'bar_chart': bar.render_embed(), 'flag': True, 'title': '声压级'}

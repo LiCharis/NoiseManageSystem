@@ -4,7 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from import_export.admin import ExportMixin
+from import_export.admin import ExportMixin, ExportActionModelAdmin
 from import_export.formats import base_formats
 
 from ManageSystem.settings import MEDIA_URL
@@ -28,14 +28,14 @@ def submit_row(context):
     return ctx
 
 
-class VolatilityManger(ExportMixin, admin.ModelAdmin):
+class VolatilityManger(ExportActionModelAdmin, admin.ModelAdmin):
 
-    # 限定格式为xlsx
-    def get_export_formats(self):  # 该方法是限制格式
-        formats = (
-            base_formats.XLSX,
-        )
-        return [f for f in formats if f().can_export()]
+    # # 限定格式为xlsx
+    # def get_export_formats(self):  # 该方法是限制格式
+    #     formats = (
+    #         base_formats.XLSX,
+    #     )
+    #     return [f for f in formats if f().can_export()]
 
     # 对接资源类
 
@@ -227,7 +227,7 @@ class VolatilityManger(ExportMixin, admin.ModelAdmin):
     #             }]
     #         }
     #     ]}
-    analyse.short_description = '数据分析'
+    analyse.short_description = '数据分析(折线图)'
     analyse.icon = 'el-icon-s-data'
     analyse.type = 'warning'
     analyse.style = 'color:rainbow;'
@@ -252,7 +252,7 @@ class VolatilityManger(ExportMixin, admin.ModelAdmin):
     # requests.post(url, data=params)
     # return True
 
-    compare.short_description = '数据对比'
+    compare.short_description = '数据对比(柱状图)'
     compare.icon = 'el-icon-s-opportunity'
     compare.type = 'danger'
     compare.style = 'color:rainbow;'
