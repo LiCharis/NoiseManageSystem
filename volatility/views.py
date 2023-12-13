@@ -142,8 +142,10 @@ def analyse(request, ids):
                 volatility.car.brand) + '/' + str(volatility.car.model)))
         y[str(volatility.status)].append(
             str(str(volatility.speed) + '/' + str(volatility.condition) + '/' + str(volatility.status) + '/' + str(
+
                 volatility.car.brand) + '/' + str(volatility.car.model)) + '/' + str(volatility.volatility_left) + '/' + str(
                 volatility.volatility_right))
+
         flag = True
         temp = re.search(r'\d{2,}', str(volatility.condition), re.M | re.I).group() + 'km'
         for i in speed_x_label:

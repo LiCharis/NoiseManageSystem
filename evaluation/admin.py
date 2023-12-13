@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from import_export.admin import ExportMixin
+from import_export.admin import ExportMixin, ExportActionModelAdmin
 from import_export.formats import base_formats
 
 from ManageSystem.settings import MEDIA_URL
@@ -29,20 +29,22 @@ def submit_row(context):
     return ctx
 
 
-class EvaluationManger(ExportMixin,admin.ModelAdmin):
+class EvaluationManger(ExportActionModelAdmin, admin.ModelAdmin):
 
-    # 限定格式为xlsx
-    def get_export_formats(self):  # 该方法是限制格式
-        formats = (
-            base_formats.XLSX,
-        )
-        return [f for f in formats if f().can_export()]
+    # # 限定格式为xlsx
+    # def get_export_formats(self):  # 该方法是限制格式
+    #     formats = (
+    #         base_formats.XLSX,
+    #     )
+    #     return [f for f in formats if f().can_export()]
 
     # 对接资源类
 
     resource_class = EvaluationResource
 
+
     list_display = ['car', 'status', 'speed', 'condition', 'index', 'operate']
+
     list_display_links = None
     search_fields = []
     list_filter = ('total__car', 'total__speed', 'total__status', 'total__condition')

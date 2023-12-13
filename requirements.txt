@@ -2,4 +2,5 @@ django
 pyecharts
 pillow
 mysqlclient
+import_export
 ```
