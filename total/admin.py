@@ -1,7 +1,7 @@
 # Register your models here.
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
-from django.db import connection
+from django.db import connection, transaction
 from django.http import HttpResponseRedirect
 
 from django.utils.safestring import mark_safe
@@ -34,7 +34,6 @@ def submit_row(context):
 
 
 class TotalManger(ExportActionModelAdmin, admin.ModelAdmin):
-
     # # 限定格式为xlsx
     # def get_export_formats(self):  # 该方法是限制格式
     #     formats = (
@@ -56,6 +55,27 @@ class TotalManger(ExportActionModelAdmin, admin.ModelAdmin):
     list_max_show_all = 10
 
     selected_id = []
+
+    # 重写保存方法，保存一个总表数据就对所有子表都增加一条数据
+    def save_model(self, request, obj, form, change):
+        try:
+            with transaction.atomic():
+                super().save_model(request, obj, form, change)
+                # 在同一个事务中执行四个 create 操作
+                # 在保存Total对象后触发逻辑
+                # 你可以根据需要添加额外的从表保存逻辑
+                if not change:
+                    Data.objects.create(total=obj)
+                    Clarity.objects.create(total=obj)
+                    Evaluation.objects.create(total=obj)
+                    Sharpness.objects.create(total=obj)
+                    Loudness.objects.create(total=obj)
+                    Volatility.objects.create(total=obj)
+
+            # 所有操作都成功，事务将被提交
+        except Exception as e:
+            # 如果发生异常，事务将被回滚
+            print(f"Error: {e}")
 
     # 重写方法屏蔽按钮
     def change_view(self, request, object_id, form_url='', extra_context=None):
