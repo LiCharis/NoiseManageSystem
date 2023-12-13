@@ -81,12 +81,46 @@ class LoudnessResource(resources.ModelResource):
         attribute='total',
         widget=ForeignKeyWidget(Total, 'loudness_result'))
 
+    speed = fields.Field(
+        column_name='速度形式',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'speed'))
+
+    condition = fields.Field(
+        column_name='工况',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'condition'))
+
+    status = fields.Field(
+        column_name='荷载状态',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'status'))
+
+    left = fields.Field(
+        column_name='响度左耳-sone',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'loudness_image'))
+
+    right = fields.Field(
+        column_name='响度右耳-sone',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'loudness_image'))
+
+    image = fields.Field(
+        column_name='图片地址',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'loudness_image'))
+
+    result = fields.Field(
+        column_name='响度-sone',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'loudness_result'))
+
     # 此处可写方法以添加更多功能
     class Meta:
         model = Loudness
         # fields内的模型字段会被导入导出, exclude内的会被排除在外，如果都不写，默认为模型中的全部字段都要包含。
         fields = ['id', 'brand', 'model', 'speed', 'condition', 'status', 'left', 'right',
-
                   'result', 'image']
 
         # excloud = ()

@@ -65,6 +65,37 @@ class EvaluationResource(resources.ModelResource):
         attribute='total',
         widget=ForeignKeyWidget(Total, 'evaluation_result'))
 
+    brand = fields.Field(
+        column_name='品牌',
+        attribute='car',
+        widget=ForeignKeyWidget(Car, 'brand'))
+
+    model = fields.Field(
+        column_name='型号',
+        attribute='car',
+        widget=ForeignKeyWidget(Car, 'model'))
+
+    # 在字段列表里加上这个自定义字段
+    speed = fields.Field(
+        column_name='速度形式',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'speed'))
+
+    condition = fields.Field(
+        column_name='工况',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'condition'))
+
+    status = fields.Field(
+        column_name='荷载状态',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'status'))
+
+    index = fields.Field(
+        column_name='声品质综合评价指数',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'evaluation_result'))
+
     # 此处可写方法以添加更多功能
     class Meta:
         model = Evaluation

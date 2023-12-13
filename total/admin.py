@@ -168,6 +168,41 @@ class TotalManger(ExportActionModelAdmin, admin.ModelAdmin):
 
         return "%s" % (evaluation_obj.index)
 
+    @admin.display(description='声压级结果', ordering='id')
+    def data(self, obj):
+        data_obj = Data.objects.get(id=obj.loudness)
+        return "%s  |  %s|  %s|  %s" % (data_obj.speed, data_obj.condition, data_obj.status, data_obj.result)
+
+    @admin.display(description='响度', ordering='id')
+    def loudness(self, obj):
+        loudness_obj = Loudness.objects.get(id=obj.loudness)
+
+        return "%s  |  %s|  %s" % (loudness_obj.left, loudness_obj.right, loudness_obj.result)
+
+    @admin.display(description='尖锐度', ordering='id')
+    def sharpness(self, obj):
+        sharpness_obj = Sharpness.objects.get(id=obj.sharpness)
+
+        return "%s  |  %s|  %s" % (sharpness_obj.left, sharpness_obj.right, sharpness_obj.result)
+
+    @admin.display(description='波动度', ordering='id')
+    def volatility(self, obj):
+        volatility_obj = Volatility.objects.get(id=obj.volatility)
+
+        return "%s  |  %s|  %s" % (volatility_obj.left, volatility_obj.right, volatility_obj.result)
+
+    @admin.display(description='语音清晰度', ordering='id')
+    def clarity(self, obj):
+        clarity_obj = Clarity.objects.get(id=obj.clarity)
+
+        return "%s  |  %s|  %s" % (clarity_obj.left, clarity_obj.right, clarity_obj.result)
+
+    @admin.display(description='声品质综合评价指数', ordering='id')
+    def evaluation(self, obj):
+        evaluation_obj = Evaluation.objects.get(id=obj.evaluation)
+
+        return "%s" % (evaluation_obj.index)
+
     # 这里应该发送一个get请求给后端返回页面，然后页面快速发送ajax请求给后端同一个view（用get，post区分开）
     # 然后后端
 

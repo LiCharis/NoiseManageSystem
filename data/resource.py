@@ -89,6 +89,53 @@ class DataResource(resources.ModelResource):
         attribute='total',
         widget=ForeignKeyWidget(Total, 'data_result'))
 
+    speed = fields.Field(
+        column_name='速度形式',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'speed'))
+
+    condition = fields.Field(
+        column_name='工况',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'condition'))
+
+    status = fields.Field(
+        column_name='荷载状态',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'status'))
+
+    first_left = fields.Field(
+        column_name='测量次数一AA-BB内最大声压级（左侧）-SPL_L',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'first_left'))
+
+    first_right = fields.Field(
+        column_name='测量次数一AA-BB内最大声压级（右侧）-SPL_R',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'first_right'))
+
+    second_left = fields.Field(
+        column_name='测量次数二AA-BB内最大声压级（左侧）-SPL_L',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'second_left'))
+
+    second_right = fields.Field(
+        column_name='测量次数二AA-BB内最大声压级（右侧）-SPL_R',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'second_right'))
+
+    image = fields.Field(
+        column_name='图片地址',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'data_image'))
+
+    result = fields.Field(
+        column_name='声压级最终结果',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'data_result'))
+
+
+
     # 在字段列表里加上这个自定义字段
 
     # 此处可写方法以添加更多功能

@@ -8,7 +8,6 @@ from data.models import Sharpness
 from total.models import Total
 
 
-
 class SharpnessResource(resources.ModelResource):
 
     def export(self, queryset=None, *args, **kwargs):
@@ -82,14 +81,12 @@ class SharpnessResource(resources.ModelResource):
         attribute='total',
         widget=ForeignKeyWidget(Total, 'sharpness_result'))
 
-
     # 此处可写方法以添加更多功能
     class Meta:
         model = Sharpness
         # fields内的模型字段会被导入导出, exclude内的会被排除在外，如果都不写，默认为模型中的全部字段都要包含。
         fields = ['id', 'brand', 'model', 'speed', 'condition', 'status', 'left', 'right',
                   'result', 'image']
-
 
         # excloud = ()
         # export_order（自定义） 选项设置导出字段的显式顺序，没在这里规定的就按默认顺序排在后面（不能只写一个）(导入不用管顺序)

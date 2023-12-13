@@ -8,7 +8,6 @@ from data.models import Volatility
 from total.models import Total
 
 
-
 class VolatilityResource(resources.ModelResource):
 
     def export(self, queryset=None, *args, **kwargs):
@@ -47,6 +46,40 @@ class VolatilityResource(resources.ModelResource):
        )
 
     # 在字段列表里加上这个自定义字段
+    speed = fields.Field(
+        column_name='速度形式',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'speed'))
+
+    condition = fields.Field(
+        column_name='工况',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'condition'))
+
+    status = fields.Field(
+        column_name='荷载状态',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'status'))
+
+    left = fields.Field(
+        column_name='波动度左耳-vacil',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'volatility_image'))
+
+    right = fields.Field(
+        column_name='波动度右耳-vacil',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'volatility_image'))
+
+    image = fields.Field(
+        column_name='图片地址',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'volatility_image'))
+
+    result = fields.Field(
+        column_name='波动度-vacil',
+        attribute='total',
+        widget=ForeignKeyWidget(Total, 'volatility_result'))
 
     speed = fields.Field(
         column_name='速度形式',
