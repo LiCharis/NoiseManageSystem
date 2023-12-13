@@ -47,7 +47,7 @@ class TotalManger(ExportActionModelAdmin, admin.ModelAdmin):
     list_display = ['car', 'status', 'speed', 'condition', 'data_result', 'clarity_left',
                     'clarity_right', 'clarity_result', 'loudness_left', 'loudness_right',
                     'loudness_result', 'sharpness_left', 'sharpness_right', 'sharpness_result',
-                    'volatility_left', 'volatility_right', 'volatility_result', 'index']
+                    'volatility_left', 'volatility_right', 'volatility_result', 'index', 'operate']
     list_display_links = None
     search_fields = []
     list_filter = ('car', 'speed', 'status', 'condition')
@@ -147,7 +147,7 @@ class TotalManger(ExportActionModelAdmin, admin.ModelAdmin):
                                 class='el-icon-delete-solid el-button el-button--danger el-button--small'>删除</button>"""
         # delete_btn = '<a class="el-icon-delete-solid el-link--danger"  href="{}">删除</a>'.format(data2)
 
-        html_str = f"<div>{update_btn} {delete_btn}</div>"
+        html_str = f"<div>{delete_btn}</div>"
         return mark_safe(html_str)
 
     # 添加按钮

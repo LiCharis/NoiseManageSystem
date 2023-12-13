@@ -40,7 +40,9 @@ def delete_true_view(request, duty_id):
         try:
             print("delete_true_view")
             print(duty_id)
-            Clarity.objects.get(id=duty_id).delete()
+            obj = Clarity.objects.get(id=duty_id)
+            Total.objects.get(id=obj.total.id).delete()
+            obj.delete()
 
         except Exception as e:
             print('delete error is %s' % (e))

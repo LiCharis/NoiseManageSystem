@@ -7,6 +7,7 @@ from car.models import Car
 from clarity.models import Clarity
 from loudness.models import Loudness
 # from data.models import data
+from total.models import Total
 from .models import Data
 
 from ManageSystem.settings import MEDIA_URL
@@ -45,7 +46,9 @@ def delete_true_view(request, duty_id):
         try:
             print("delete_true_view")
             print(duty_id)
-            Data.objects.get(id=duty_id).delete()
+            obj = Data.objects.get(id=duty_id)
+            Total.objects.get(id=obj.total.id).delete()
+            obj.delete()
 
         except Exception as e:
             print('delete error is %s' % (e))

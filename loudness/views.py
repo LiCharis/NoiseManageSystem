@@ -7,6 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 
 from ManageSystem.settings import MEDIA_URL
+from total.models import Total
 from .models import Loudness
 import re
 from pyecharts import options as opts
@@ -43,7 +44,9 @@ def delete_true_view(request, duty_id):
         try:
             print("delete_true_view")
             print(duty_id)
-            Loudness.objects.get(id=duty_id).delete()
+            obj = Loudness.objects.get(id=duty_id)
+            Total.objects.get(id=obj.total.id).delete()
+            obj.delete()
 
         except Exception as e:
             print('delete error is %s' % (e))

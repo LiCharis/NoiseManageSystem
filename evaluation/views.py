@@ -8,6 +8,8 @@ from django.shortcuts import render
 # Create your views here.
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+
+from total.models import Total
 from .models import Evaluation
 
 def delete_true_view(request, duty_id):
@@ -40,7 +42,9 @@ def delete_true_view(request, duty_id):
         try:
             print("delete_true_view")
             print(duty_id)
-            Evaluation.objects.get(id=duty_id).delete()
+            obj = Evaluation.objects.get(id=duty_id)
+            Total.objects.get(id=obj.total.id).delete()
+            obj.delete()
 
         except Exception as e:
             print('delete error is %s' % (e))

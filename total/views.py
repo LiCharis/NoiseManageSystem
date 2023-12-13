@@ -35,6 +35,7 @@ def delete_true_view(request, duty_id):
         except Exception as e:
             print('delete error is %s' % (e))
 
+
         return render(request, 'ManageSystem/delete.html', locals())
 
 
@@ -55,20 +56,6 @@ def delete_true_view(request, duty_id):
 
     return HttpResponseRedirect("/admin/total/total")
 
-
-# def res_view(request):
-#     return render(request, 'ManageSystem/analyse.html')
-#
-#
-# def analyse(request):
-#     analyseParam = request.POST['analyse']
-#     forceParam = request.POST['force']
-#     print(analyseParam)
-#     print(forceParam)
-#     request.res = 'res'
-#     result_url = "/static/images/交大鸽子.jpg"
-#     return render(request, 'ManageSystem/analyse.html', locals())
-#
 
 def get_preview(request):
     action = '/admin/total/total'
