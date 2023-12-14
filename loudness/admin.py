@@ -128,10 +128,7 @@ class LoudnessManger(ExportActionModelAdmin, admin.ModelAdmin):
                 self.list_display.append('operate')
         return actions
 
-
     def has_add_permission(self, request):
-        if request.user.is_superuser:
-            return True
         return False
 
 
