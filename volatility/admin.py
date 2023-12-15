@@ -174,57 +174,7 @@ class VolatilityManger(ExportActionModelAdmin, admin.ModelAdmin):
         selected = queryset.values_list('pk', flat=True)
         return HttpResponseRedirect("/volatility/analyse/{}".format('.'.join(str(pk) for pk in selected)))
 
-    # analyse.layer = {
-    #     # 弹出层中的输入框配置
-    #     # 这里指定对话框的标题
-    #     'title': '数据分析',
-    #     # 提示信息
-    #     'tips': '数据分析的弹出表单',
-    #     # 弹出层对话框的宽度，默认50%
-    #     'width': '95%',
-    #     # 表单中 label的宽度，对应element-ui的 label-width，默认80px
-    #     'labelWidth': "80px",
-    #     # 确认按钮显示文本
-    #     'confirm_button': '确认提交',
-    #     # 取消按钮显示文本
-    #     'cancel_button': '取消',
-    #
-    #     'url': "http://www.baidu.com",
-    #     'params': [{
-    #         'type': 'select',
-    #         'key': 'type',
-    #         'label': '选择分析参数',
-    #         'width': '200px',
-    #         # size对应elementui的size，取值为：medium  small  mini
-    #         'size': 'medium',
-    #         # value字段可以指定默认值
-    #         'value': '0',
-    #         'options': [{
-    #             'key': '0',
-    #             'label': '11'
-    #         }, {
-    #             'key': '1',
-    #             'label': '22'
-    #         }]
-    #     },
-    #         {
-    #             'type': 'select',
-    #             'key': 'type',
-    #             'label': '选择动力形式',
-    #             'width': '200px',
-    #             # size对应elementui的size，取值为：medium  small  mini
-    #             'size': 'small',
-    #             # value字段可以指定默认值
-    #             'value': '1',
-    #             'options': [{
-    #                 'key': '0',
-    #                 'label': '11'
-    #             }, {
-    #                 'key': '1',
-    #                 'label': '22'
-    #             }]
-    #         }
-    #     ]}
+
     analyse.short_description = '数据分析(折线图)'
     analyse.icon = 'el-icon-s-data'
     analyse.type = 'warning'

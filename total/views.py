@@ -35,7 +35,6 @@ def delete_true_view(request, duty_id):
         except Exception as e:
             print('delete error is %s' % (e))
 
-
         return render(request, 'ManageSystem/delete.html', locals())
 
 
@@ -57,7 +56,9 @@ def delete_true_view(request, duty_id):
     return HttpResponseRedirect("/admin/total/total")
 
 
-def get_preview(request):
+def get_preview(request, ids):
+    id_list = list(map(int, ids.split(".")))
+
     action = '/admin/total/total'
     output = '/admin/total/total/export/?'
     total_fields = ['data_result', 'clarity_left',
@@ -66,7 +67,7 @@ def get_preview(request):
                     'volatility_left', 'volatility_right', 'volatility_result', 'index']
     result = {}
     try:
-        data_to_preview = Total.objects.all()  # 获取要预览的数据
+        data_to_preview = Total.objects.filter(id__in=id_list)  # 获取要预览的数据
 
         for field in total_fields:
             max_value = Total.objects.aggregate(Max(field))
@@ -75,21 +76,6 @@ def get_preview(request):
                 'max': max_value[f'{field}__max'],
                 'min': min_value[f'{field}__min'],
             }
-        #
-        # # 遍历查询集合并修改记录
-        # i = 0
-        # for data in data_to_preview:
-        #     for field, values in result.items():
-        #         temp = getattr(data, field)
-        #         if getattr(data, field) == values['max']:
-        #             setattr(data, "color", 'blue')
-        #
-        #         elif getattr(data, field) == values['min']:
-        #             setattr(data, "color", 'red')
-        #         # else:
-        #         #     setattr(data, "color", 'black')
-        #         print(data.color)
-
 
 
     except Exception as e:

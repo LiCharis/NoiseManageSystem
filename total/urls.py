@@ -8,5 +8,5 @@ urlpatterns = [
     path('get_image/<int:id>', views.get_image),
     path('compare/<str:ids>', views.compare),
     path('analyse/<str:ids>', views.analyse),
-    path('get_preview', views.get_preview)
+    path('get_preview/<str:ids>', views.get_preview)
 ]
