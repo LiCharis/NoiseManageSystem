@@ -60,7 +60,6 @@ def get_preview(request, ids):
     id_list = list(map(int, ids.split(".")))
 
     action = '/admin/total/total'
-    output = '/admin/total/total/export/?'
     total_fields = ['data_result', 'clarity_left',
                     'clarity_right', 'clarity_result', 'loudness_left', 'loudness_right',
                     'loudness_result', 'sharpness_left', 'sharpness_right', 'sharpness_result',
