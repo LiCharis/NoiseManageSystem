@@ -59,7 +59,7 @@
                 <th style="color: {% if data.volatility_left == result.volatility_left.max %}blue{% elif data.volatility_left == result.volatility_left.min %}red{% else %}black{% endif %}">{{ data.volatility_left }}</th>
                 <th style="color: {% if data.volatility_right == result.volatility_right.max %}blue{% elif data.volatility_right == result.volatility_right.min %}red{% else %}black{% endif %}">{{ data.volatility_right }}</th>
                 <th style="color: {% if data.volatility_result == result.volatility_result.max %}blue{% elif data.volatility_result == result.volatility_result.min %}red{% else %}black{% endif %}">{{ data.volatility_result }}</th>
-                <th>{{ data.index }}</th>
+                <th style="color: {% if data.index == result.index.max %}blue{% elif data.index == result.index.min %}red{% else %}black{% endif %}">{{ data.index }}</th>
 
              
             </tr>
