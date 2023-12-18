@@ -19,6 +19,7 @@ from django.urls import path, include, re_path
 from django.views.generic import RedirectView
 
 from . import views as managesystem_Views, settings
+from django.shortcuts import redirect
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,7 +33,8 @@ urlpatterns = [
     path('clarity/', include('clarity.urls')),
     path('user/', include('user.urls')),
     path('evaluation/', include('evaluation.urls')),
-    path('total/', include('total.urls'))
+    path('total/', include('total.urls')),
+    path('', admin.site.urls),
 
 ]
 
